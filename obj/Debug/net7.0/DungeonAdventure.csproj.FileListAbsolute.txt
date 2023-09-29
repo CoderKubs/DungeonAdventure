@@ -1,0 +1,14 @@
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\bin\Debug\net7.0\DungeonAdventure.exe
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\bin\Debug\net7.0\DungeonAdventure.deps.json
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\bin\Debug\net7.0\DungeonAdventure.runtimeconfig.json
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\bin\Debug\net7.0\DungeonAdventure.dll
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\bin\Debug\net7.0\DungeonAdventure.pdb
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.GeneratedMSBuildEditorConfig.editorconfig
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.AssemblyInfoInputs.cache
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.AssemblyInfo.cs
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.csproj.CoreCompileInputs.cache
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.dll
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\refint\DungeonAdventure.dll
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.pdb
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\DungeonAdventure.genruntimeconfig.cache
+D:\Kaylor\my-code-dir\DungeonAdventure\DungeonAdventure\obj\Debug\net7.0\ref\DungeonAdventure.dll
