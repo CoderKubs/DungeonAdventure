@@ -3,7 +3,9 @@
 
 
 //Level 1 dictionary holding the level info
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.ExceptionServices;
+using System.Runtime.InteropServices;
 using System.Xml;
 
 public class Program
@@ -21,32 +23,46 @@ public class Program
                             "\nYou wake up in a dark dungeon",
                         }
                     },
-                    { "options", new List<Tuple<string, int>>
+                    { "map", new char[][]
                         {
-                            Tuple.Create("north", 2),
-                            Tuple.Create("south", 3),
-                            Tuple.Create("east", 4),
-                            Tuple.Create("west", 5),
-                            Tuple.Create("n", 2),
-                            Tuple.Create("s", 1),
-                            Tuple.Create("e", 4),
-                            Tuple.Create("w", 5),
-                            Tuple.Create("gate", 2),
+                            new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', ' ', 'o', 'x'},
+                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', ' ', 'x', 'x'},
+                            new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x'},
+                            }
+
+                    }
+                };
+
+        Dictionary<string, object> level2 = new Dictionary<string, object>
+                {
+                    { "text", new List<string>
+                        {
+                            "\n'Where am I?' You ask, but no one can hear you",
+                            "\n'Maybe I should try to find someone...'",
                         }
                     },
                     { "map", new char[][]
                         {
                             new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                            new char[] { 'x', 'x', ' ', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x' },
-                            new char[] { 'x', 'x', ' ', 'x', 'x', ' ', 'x', ' ', ' ', ' ', 'x', 'x' },
-                            new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
-                            new char[] { 'x', 'x', ' ', ' ', ' ', 'x', 'x', ' ', ' ', ' ', ' ', 'x' },
-                            new char[] { 'x', 'x', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', ' ', 'x' },
-                            new char[] { 'x', 'x', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', ' ', 'x' },
-                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x' },
-                            new char[] { 'x', ' ', 'x', 'x', '@', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
-                            new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' }
-                        }
+                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', ' ', 'o', 'x'},
+                            new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                            new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                            }
 
                     }
                 };
@@ -64,6 +80,8 @@ public class Program
         //
         //Main game
         //
+        Console.BackgroundColor = ConsoleColor.Black;
+        Console.Clear();
         do{
             DisplayLevel(level1Layout,level1Text,playerChar);
             //asks if they want to move and move
@@ -107,31 +125,31 @@ public class Program
             bool isTheLocationValid = false;
 
             //store the player location in location
-            int[] playerlocation =  FindPlayer(levelLayout);
+            int[] playerLocation =  FindPlayer(levelLayout, playerChar);
 
             if(keyInfo.Key == ConsoleKey.RightArrow){
-                isTheLocationValid = CheckPlayerMovement(playerlocation[0],playerlocation[1]+1, levelLayout);
+                isTheLocationValid = CheckPlayerMovement(playerLocation[0],playerLocation[1], levelLayout, "right");
                 if(isTheLocationValid){
-                    levelLayout[playerlocation[0]][playerlocation[1]] = ' ';
-                    levelLayout[playerlocation[0]][playerlocation[1]+1] = '@';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]][playerLocation[1]+1] = playerChar;
                 }
             } else if(keyInfo.Key == ConsoleKey.LeftArrow){
-                isTheLocationValid = CheckPlayerMovement(playerlocation[0],playerlocation[1]-1, levelLayout);
+                isTheLocationValid = CheckPlayerMovement(playerLocation[0],playerLocation[1], levelLayout, "left");
                 if(isTheLocationValid){
-                    levelLayout[playerlocation[0]][playerlocation[1]] = ' ';
-                    levelLayout[playerlocation[0]][playerlocation[1]-1] = '@';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]][playerLocation[1]-1] = playerChar;
                 }
             } else if(keyInfo.Key == ConsoleKey.DownArrow){
-                isTheLocationValid = CheckPlayerMovement(playerlocation[0]+1,playerlocation[1], levelLayout);
+                isTheLocationValid = CheckPlayerMovement(playerLocation[0],playerLocation[1], levelLayout, "down");
                 if(isTheLocationValid){
-                    levelLayout[playerlocation[0]][playerlocation[1]] = ' ';
-                    levelLayout[playerlocation[0]+1][playerlocation[1]] = '@';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]+1][playerLocation[1]] = playerChar;
                 }
             } else if(keyInfo.Key == ConsoleKey.UpArrow){
-                isTheLocationValid = CheckPlayerMovement(playerlocation[0]-1,playerlocation[1], levelLayout);
+                isTheLocationValid = CheckPlayerMovement(playerLocation[0],playerLocation[1], levelLayout, "up");
                     if(isTheLocationValid){
-                    levelLayout[playerlocation[0]][playerlocation[1]] = ' ';
-                    levelLayout[playerlocation[0]-1][playerlocation[1]] = '@';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]-1][playerLocation[1]] = playerChar;
                 }
             } else if(keyInfo.Key == ConsoleKey.Escape){
                 moving = false;
@@ -141,11 +159,11 @@ public class Program
 
     }
 
-    //returns the posisiton of the player in int[x,y] format
-    static int[] FindPlayer(char[][] levelLayout){
+    //returns the posisiton of the player in int[y,x] format
+    static int[] FindPlayer(char[][] levelLayout, char playerChar){
         for (int i = 0; i < levelLayout.Length; i++){
             for (int j = 0; j < levelLayout[i].Length; j++){
-                if(levelLayout[i][j] == '@'){
+                if(levelLayout[i][j] == playerChar){
                     return new int[2] {i, j};
                 }
             }
@@ -176,11 +194,64 @@ public class Program
     }
 
     // Input an X and Y and see if the player can move there
-    static bool CheckPlayerMovement(int x, int y, char[][] levelLayout){
-        if(levelLayout[x][y] == ' '){
-            return true;
-        } else {
-            return false;
+    static bool CheckPlayerMovement(int y, int x, char[][] levelLayout, string direction){
+        {
+            if (direction == "down")//Do this on each one. If the direction you are moving takes you out of bounds, return false. then check if its not a ' '.
+            {
+                if (y + 1 < levelLayout.Length)
+                {
+                    if (levelLayout[y+1][x] != ' '){
+                        return false;
+                    } else {return true;}
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (direction == "up")
+            {
+                if (y - 1 >= 0)
+                {
+                    if (levelLayout[y-1][x] != ' '){
+                        return false;
+                    } else {return true;}
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (direction == "left")
+            {
+                if (x - 1 >= 0)
+                {
+                    if (levelLayout[y][x-1] != ' '){
+                        return false;
+                    } else {return true;}
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (direction == "right")
+            {
+                if (x + 1 < levelLayout[y].Length)
+                {
+                    if (levelLayout[y][x+1] != ' '){
+                        return false;
+                    } else {return true;}
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -198,19 +269,28 @@ public class Program
         {
             foreach (char tile in row){
                 if(tile == 'x'){
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write(tile);
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.DarkGray;
+                    Console.Write(" ");
+
                 } else
                 if(tile == playerChar){
-                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(tile);
-                    Console.ForegroundColor = ConsoleColor.White;
+
+                    
+
                 } else{
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(tile);
                 }
             }
             Console.WriteLine();
         }
+        Console.ForegroundColor = ConsoleColor.Black;
+        Console.BackgroundColor = ConsoleColor.Black;
     }
 }
