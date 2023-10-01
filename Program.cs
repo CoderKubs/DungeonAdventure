@@ -37,11 +37,11 @@ public class Program
                                     new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
                                     new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
                                     new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
-                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', ' ', 'o', 'x'},
-                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
+                                    new char[] { ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
+                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
+                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', 'o', 'x'},
+                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     }
 
@@ -50,7 +50,7 @@ public class Program
                                 {
                                     Tuple.Create("north", 2),
                                     Tuple.Create("south", 2),
-                                    Tuple.Create("east", 2),
+                                    Tuple.Create("east", 3),
                                     Tuple.Create("west", 2)
                                 }
                             }
@@ -77,8 +77,8 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
@@ -89,8 +89,47 @@ public class Program
                                 {
                                     Tuple.Create("north", 1),
                                     Tuple.Create("south", 2),
-                                    Tuple.Create("east", 2),
+                                    Tuple.Create("east", 1),
                                     Tuple.Create("west", 2)
+                                }
+                            }
+                        }
+
+                    },
+                    {  "level3", new Dictionary<string, object>
+                        {
+                            { "text", new List<string>
+                                {
+                                    "\n'Where am I?' You ask, but no one can hear you",
+                                    "\n'Maybe I should try to find someone...'",
+                                }
+                            },
+                            { "levelNumber", new List<int>
+                                {
+                                    1,
+                                }
+                            },
+                            { "map", new char[][]
+                                {
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' '},
+                                    new char[] { ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' '},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    }
+
+                            },
+                            { "directions", new List<Tuple<string, int>>
+                                {
+                                    Tuple.Create("north", 1),
+                                    Tuple.Create("south", 2),
+                                    Tuple.Create("east", 1),
+                                    Tuple.Create("west", 1)
                                 }
                             }
                         }
@@ -198,11 +237,13 @@ public class Program
                     
                     //sets the player location on the old map to " " and adds it to the new map
                     levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
-                    SetNewLevelPlayerPosition(levels, newLevelNumber, playerLocation[0], newLevelLayout[1].Length-1, playerChar);
+                    SetNewLevelPlayerPosition(levels, newLevelNumber, playerLocation[0], newLevelLayout[0].Length-1, playerChar);
                 }
             } else if(keyInfo.Key == ConsoleKey.DownArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0],playerLocation[1], level, "down");
                 if(isTheLocationValid){
+
+                    // Move the player by replacing it and placing it again
                     levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
                     levelLayout[playerLocation[0]+1][playerLocation[1]] = playerChar;
                 } else if(newLevelNumber != currentLevel){
