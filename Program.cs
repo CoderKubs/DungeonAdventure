@@ -25,11 +25,6 @@ public class Program
                                     "\n'Maybe I should try to find someone...'",
                                 }
                             },
-                            { "levelNumber", new List<int>
-                                {
-                                    1,
-                                }
-                            },
                             { "map", new char[][]
                                 {
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
@@ -65,11 +60,6 @@ public class Program
                                     "\n'Maybe I should try to find someone...'",
                                 }
                             },
-                            { "levelNumber", new List<int>
-                                {
-                                    1,
-                                }
-                            },
                             { "map", new char[][]
                                 {
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
@@ -102,11 +92,6 @@ public class Program
                                 {
                                     "\n'Where am I?' You ask, but no one can hear you",
                                     "\n'Maybe I should try to find someone...'",
-                                }
-                            },
-                            { "levelNumber", new List<int>
-                                {
-                                    1,
                                 }
                             },
                             { "map", new char[][]
