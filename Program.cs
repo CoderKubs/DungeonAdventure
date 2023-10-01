@@ -425,21 +425,21 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                 if(tile == 'x'){
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.DarkGray;
-                    Console.Write(" ");
+                    Console.Write("  ");
 
                 } else
                 if(tile == playerChar){
                     
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write(tile);
+                    Console.Write($"()");
 
                     
 
                 } else{
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write(tile);
+                    Console.Write($"{tile} ");
                 }
             }
             Console.WriteLine();
