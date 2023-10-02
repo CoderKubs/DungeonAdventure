@@ -12,6 +12,7 @@ using System.Xml;
 public class Program
 {
     public static int currentLevel;
+    public static char lastTile = ' ';
     public static void Main(){
 
         
@@ -22,7 +23,7 @@ public class Program
                             { "text", new List<string>
                                 {
                                     "\n'Where am I?' You ask, but no one can hear you",
-                                    "\n'Maybe I should try to find someone...'",
+                                    "'Maybe I should try to find someone...'",
                                 }
                             },
                             { "map", new char[][]
@@ -43,6 +44,7 @@ public class Program
                             },
                             { "directions", new List<Tuple<string, int>>
                                 {
+                                    //tuple saying what level to switch to if you go north
                                     Tuple.Create("north", 2),
                                     Tuple.Create("south", 2),
                                     Tuple.Create("east", 3),
@@ -67,8 +69,8 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' '},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' '},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
@@ -152,12 +154,38 @@ public class Program
 
             if(output.ToLower() == "move"){
                 //Enters move character mode and it wont exit until you press escape.
+                bool moving = true;
+                int pastMovesStopped = 0;
                 do{
-                    int newLevel = MoveCharacter(levels,playerChar);
+                    int newLevel = currentLevel;
+
+                    //Move the player
+
+                    if(lastTile == 'w'){
+                        if(pastMovesStopped == 2){
+
+                            pastMovesStopped = 0;
+                            (newLevel, moving) = MoveCharacter(levels,playerChar);
+
+                        } else {
+                            pastMovesStopped ++;
+                            
+                            ConsoleKeyInfo keyInfo = GetDirectionFromPlayer();
+                            if (keyInfo.Key == ConsoleKey.Escape){
+                                moving = false;
+                            }
+                        }
+                    } else {
+                        (newLevel, moving) = MoveCharacter(levels,playerChar);
+                        pastMovesStopped = 0;
+
+                    }
+                    
+                    //Update the level
                     if (newLevel != currentLevel){
                         currentLevel = newLevel;
-                    } else {break;}
-                }while(true);      
+                    }
+                }while(moving);      
             
             }
         } while (true);
@@ -179,16 +207,12 @@ public class Program
 
 
     //asks the player where to go and checks if its valid. If it is, move them there.
-    static int MoveCharacter(Dictionary<string,object> levels,char playerChar){
+    static (int, bool) MoveCharacter(Dictionary<string,object> levels,char playerChar){
 
-        //Set the variables for use later
-        Dictionary<string, object> level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
-        char[][] levelLayout = (char[][])level["map"];
-        char[][] newLevelLayout = (char[][])level["map"];
+            Dictionary<string, object> level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
+            char[][] levelLayout = (char[][])level["map"];
+            char[][] newLevelLayout = (char[][])level["map"];
         
-
-        bool moving = true;
-        do{
             DisplayLevel(level,playerChar);
             Console.WriteLine("Where do you want to go?");
             Console.WriteLine("Use the arrow keys or press escape to stop");
@@ -205,7 +229,8 @@ public class Program
             if(keyInfo.Key == ConsoleKey.RightArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0],playerLocation[1], level, "right");
                 if(isTheLocationValid){
-                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
+                    lastTile = levelLayout[playerLocation[0]][playerLocation[1]+1];
                     levelLayout[playerLocation[0]][playerLocation[1]+1] = playerChar;
                 } else if(newLevelNumber != currentLevel){
 
@@ -216,7 +241,8 @@ public class Program
             } else if(keyInfo.Key == ConsoleKey.LeftArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0], playerLocation[1], level, "left");
                 if(isTheLocationValid){
-                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
+                    lastTile = levelLayout[playerLocation[0]][playerLocation[1]-1];
                     levelLayout[playerLocation[0]][playerLocation[1]-1] = playerChar;
                 } else if(newLevelNumber != currentLevel){
                     
@@ -229,7 +255,8 @@ public class Program
                 if(isTheLocationValid){
 
                     // Move the player by replacing it and placing it again
-                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
+                    lastTile = levelLayout[playerLocation[0]+1][playerLocation[1]];
                     levelLayout[playerLocation[0]+1][playerLocation[1]] = playerChar;
                 } else if(newLevelNumber != currentLevel){
 
@@ -241,7 +268,10 @@ public class Program
             } else if(keyInfo.Key == ConsoleKey.UpArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0], playerLocation[1], level, "up");
                     if(isTheLocationValid){
-                    levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
+                    // Replace the correct tile the player was standing on
+                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
+                    // store the tile the player is standing on as lastTile
+                    lastTile = levelLayout[playerLocation[0]-1][playerLocation[1]];
                     levelLayout[playerLocation[0]-1][playerLocation[1]] = playerChar;
                 } else if(newLevelNumber != currentLevel){
                     
@@ -250,16 +280,16 @@ public class Program
                     SetNewLevelPlayerPosition(levels, newLevelNumber, newLevelLayout.Length, playerLocation[1] , playerChar);
                 }
             } else if(keyInfo.Key == ConsoleKey.Escape){
-                moving = false;
+                return (currentLevel, false);
             }
 
             if (newLevelNumber != currentLevel)
             {
-                return newLevelNumber;
+                return (newLevelNumber, true);
             }
-        } while(moving);
+        
 
-        return currentLevel;
+        return (currentLevel, true);
     }
 
 static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int newLevelNumber, int y, int x, char playerChar)
@@ -322,7 +352,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (y + 1 < levelLayout.Length)
                 {
-                    if (levelLayout[y+1][x] != ' '){
+                    if (levelLayout[y+1][x] == 'x'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -336,7 +366,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (y - 1 >= 0)
                 {
-                    if (levelLayout[y-1][x] != ' '){
+                    if (levelLayout[y-1][x] == 'x'){
                         return Tuple.Create(false, currentLevel);;
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -349,7 +379,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (x - 1 >= 0)
                 {
-                    if (levelLayout[y][x-1] != ' '){
+                    if (levelLayout[y][x-1] == 'x'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -362,7 +392,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (x + 1 < levelLayout[y].Length)
                 {
-                    if (levelLayout[y][x+1] != ' '){
+                    if (levelLayout[y][x+1] == 'x'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -403,26 +433,35 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         Console.WriteLine(text);
 
         // Print the level layout
-        Console.WriteLine("Level Layout:");
+        Console.WriteLine("\n");
         foreach (char[] row in map)
         {
             foreach (char tile in row){
                 if(tile == 'x'){
-                    Console.ForegroundColor = ConsoleColor.Black;
+
                     Console.BackgroundColor = ConsoleColor.DarkGray;
                     Console.Write("  ");
 
                 } else
                 if(tile == playerChar){
+                    if(lastTile == ' '){
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    } else if (lastTile == 'w'){
+                        Console.BackgroundColor = ConsoleColor.Cyan;
+                    }
                     
-                    Console.ForegroundColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write($"()");
 
                     
 
-                } else{
-                    Console.ForegroundColor = ConsoleColor.Black;
+                } else
+                if(tile == 'w'){
+                    
+                    Console.BackgroundColor = ConsoleColor.Cyan;
+                    Console.Write($"  ");
+
+                }
+                 else{
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write($"{tile} ");
                 }
