@@ -168,7 +168,7 @@ public class Program
                     int newLevel = currentLevel;
 
                     //Move the player
-
+                    //Make water slow down the player
                     if(lastTile == 'w'){
                         if(pastMovesStopped == 2){
 
@@ -189,12 +189,20 @@ public class Program
 
                     }
                     
+
                     //Update the level
                     if (newLevel != currentLevel){
                         currentLevel = newLevel;
                     }
+
+
                     MoveBots(level,playerChar);
-                }while(moving);      
+                    bool botNearby = CheckIfBotNearby(level, playerChar);
+
+                    if(botNearby){
+                        break;
+                    }
+                }while(moving);    
             
             }
         } while (true);
@@ -202,6 +210,31 @@ public class Program
 
 
 
+    static bool CheckIfBotNearby(Dictionary<string,object> level,char playerChar){
+
+        //find player position
+        int[] playerPosition = FindPlayer(level, playerChar);
+
+        //set bots to a list of bots in the current level
+        List<Tuple<char, string, char, bool>> bots = (List<Tuple<char, string, char, bool>>)level["bots"];
+
+        foreach(Tuple<char, string, char, bool> bot in bots){
+            //Set botChar to the character that the bot represents
+            char botChar = bot.Item1;
+
+            int[] botPosition = FindPlayer(level, botChar);
+
+            int horizontalDistance = Math.Abs(botPosition[0] - playerPosition[0]);
+            int verticalDistance = Math.Abs(botPosition[1] - playerPosition[1]);
+
+            // Check if the bot is within one space of the player
+            if (horizontalDistance <= 1 && verticalDistance <= 1)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
@@ -225,7 +258,6 @@ public class Program
             } else{
 
                 // Wandering ai
-
                 int [] botPosition = FindPlayer(level, botChar);
                 Tuple<bool,int> checkMovement = CheckPlayerMovement(botPosition[0], botPosition[1], level, direction);
                 bool successful = checkMovement.Item1;
