@@ -3,7 +3,9 @@
 
 
 //Level 1 dictionary holding the level info
+using System.Diagnostics.Tracing;
 using System.Dynamic;
+using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -34,10 +36,10 @@ public class Program
                                     new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
                                     new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
                                     new char[] { ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
-                                    new char[] { ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
+                                    new char[] { ' ', '2', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
                                     new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
                                     new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', 'o', 'x'},
-                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', '1', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     }
 
@@ -49,6 +51,12 @@ public class Program
                                     Tuple.Create("south", 2),
                                     Tuple.Create("east", 3),
                                     Tuple.Create("west", 2)
+                                }
+                            },
+                            { "bots", new List<Tuple<char, string, char, bool>>
+                                {
+                                    Tuple.Create('1',"up", ' ', false),
+                                    Tuple.Create('2',"left", ' ', false)
                                 }
                             }
                         }
@@ -185,12 +193,75 @@ public class Program
                     if (newLevel != currentLevel){
                         currentLevel = newLevel;
                     }
+                    MoveBots(level,playerChar);
                 }while(moving);      
             
             }
         } while (true);
     }
 
+
+
+
+
+
+
+    static void MoveBots(Dictionary<string,object> level,char playerChar){
+        
+        //Create a new list that will replace the bots list but with new positions
+        List<Tuple<char, string, char, bool>> updatedBots = new List<Tuple<char, string, char, bool>>();
+
+        List<Tuple<char, string, char, bool>> bots = (List<Tuple<char, string, char, bool>>)level["bots"];
+        foreach(Tuple<char, string, char, bool> bot in bots){
+
+            //break apart the bots info
+            string direction = bot.Item2;
+            char standingOnWhat = bot.Item3;
+            bool chasingPlayer = bot.Item4;
+            char botChar = bot.Item1;
+
+            if(chasingPlayer){
+
+            } else{
+
+                // Wandering ai
+
+                int [] botPosition = FindPlayer(level, botChar);
+                Tuple<bool,int> checkMovement = CheckPlayerMovement(botPosition[0], botPosition[1], level, direction);
+                bool successful = checkMovement.Item1;
+
+                if(successful){
+                    standingOnWhat = MoveCharToPlace(level, botChar, direction, standingOnWhat);
+                } else {
+
+                    // Rotate the direction 90 degrees clockwise using a switch
+                    switch (direction)
+                    {
+                        case "up":
+                            direction = "right";
+                            break;
+                        case "right":
+                            direction = "down";
+                            break;
+                        case "down":
+                            direction = "left";
+                            break;
+                        case "left":
+                            direction = "up";
+                            break;
+                    }
+                }
+                // Create an updated Tuple with the new direction and add it to the updatedBots list
+                updatedBots.Add(new Tuple<char, string, char, bool>(botChar, direction, standingOnWhat, chasingPlayer));
+
+            }
+
+            // Replace the original 'bots' list with the updated 'updatedBots' list
+            level["bots"] = updatedBots;
+
+        }
+
+    }
 
 
 
@@ -229,9 +300,8 @@ public class Program
             if(keyInfo.Key == ConsoleKey.RightArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0],playerLocation[1], level, "right");
                 if(isTheLocationValid){
-                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
-                    lastTile = levelLayout[playerLocation[0]][playerLocation[1]+1];
-                    levelLayout[playerLocation[0]][playerLocation[1]+1] = playerChar;
+                    lastTile = MoveCharToPlace(level, playerChar, "right", lastTile);
+
                 } else if(newLevelNumber != currentLevel){
 
                     //sets the player location on the old map to " " and adds it to the new map
@@ -241,9 +311,9 @@ public class Program
             } else if(keyInfo.Key == ConsoleKey.LeftArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0], playerLocation[1], level, "left");
                 if(isTheLocationValid){
-                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
-                    lastTile = levelLayout[playerLocation[0]][playerLocation[1]-1];
-                    levelLayout[playerLocation[0]][playerLocation[1]-1] = playerChar;
+
+                    lastTile = MoveCharToPlace(level, playerChar, "left", lastTile);
+
                 } else if(newLevelNumber != currentLevel){
                     
                     //sets the player location on the old map to " " and adds it to the new map
@@ -254,10 +324,8 @@ public class Program
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0],playerLocation[1], level, "down");
                 if(isTheLocationValid){
 
-                    // Move the player by replacing it and placing it again
-                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
-                    lastTile = levelLayout[playerLocation[0]+1][playerLocation[1]];
-                    levelLayout[playerLocation[0]+1][playerLocation[1]] = playerChar;
+                    lastTile = MoveCharToPlace(level, playerChar, "down", lastTile);
+
                 } else if(newLevelNumber != currentLevel){
 
                     //sets the player location on the old map to " " and adds it to the new map
@@ -268,17 +336,16 @@ public class Program
             } else if(keyInfo.Key == ConsoleKey.UpArrow){
                 (isTheLocationValid, newLevelNumber) = CheckPlayerMovement(playerLocation[0], playerLocation[1], level, "up");
                     if(isTheLocationValid){
-                    // Replace the correct tile the player was standing on
-                    levelLayout[playerLocation[0]][playerLocation[1]] = lastTile;
-                    // store the tile the player is standing on as lastTile
-                    lastTile = levelLayout[playerLocation[0]-1][playerLocation[1]];
-                    levelLayout[playerLocation[0]-1][playerLocation[1]] = playerChar;
+
+                    lastTile = MoveCharToPlace(level, playerChar, "up", lastTile);
+
                 } else if(newLevelNumber != currentLevel){
                     
                     //sets the player location on the old map to " " and adds it to the new map
                     levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
                     SetNewLevelPlayerPosition(levels, newLevelNumber, newLevelLayout.Length, playerLocation[1] , playerChar);
                 }
+
             } else if(keyInfo.Key == ConsoleKey.Escape){
                 return (currentLevel, false);
             }
@@ -291,6 +358,35 @@ public class Program
 
         return (currentLevel, true);
     }
+
+static char MoveCharToPlace(Dictionary<string, object> level, char thingToMove, string directon, char whatToReplaceWith){
+            char lastTile = ' ';
+            char[][] levelLayout = (char[][])level["map"];
+            int[] thingToMoveLocation =  FindPlayer(level, thingToMove);
+
+            if(directon == "right"){
+                    lastTile = levelLayout[thingToMoveLocation[0]][thingToMoveLocation[1]+1];
+                    levelLayout[thingToMoveLocation[0]][thingToMoveLocation[1]+1] = thingToMove;
+            
+            } else if(directon == "left"){
+                    lastTile = levelLayout[thingToMoveLocation[0]][thingToMoveLocation[1]-1];
+                    levelLayout[thingToMoveLocation[0]][thingToMoveLocation[1]-1] = thingToMove;
+
+            } else if(directon == "down"){
+                    lastTile = levelLayout[thingToMoveLocation[0]+1][thingToMoveLocation[1]];
+                    levelLayout[thingToMoveLocation[0]+1][thingToMoveLocation[1]] = thingToMove;
+
+
+            } else if(directon == "up"){
+                    lastTile = levelLayout[thingToMoveLocation[0]-1][thingToMoveLocation[1]];
+                    levelLayout[thingToMoveLocation[0]-1][thingToMoveLocation[1]] = thingToMove;
+            }
+
+            levelLayout[thingToMoveLocation[0]][thingToMoveLocation[1]] = whatToReplaceWith;
+            return lastTile;
+}
+
+
 
 static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int newLevelNumber, int y, int x, char playerChar)
 {
@@ -342,8 +438,10 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         } while (true);
     }
 
-    // Input an X and Y and see if the player can move there
-    static Tuple<bool,int> CheckPlayerMovement(int y, int x, Dictionary<string, object> level, string direction)
+
+    //inputs y and x position of object, level, direction object is trying to go.
+    //outputs, is it valid?, level to swap to if you want to do that 
+    static Tuple<bool,int> CheckPlayerMovement(int y , int x, Dictionary<string, object> level, string direction)
         {
             char[][] levelLayout = (char[][])level["map"];
             List<Tuple<string, int>> options = (List<Tuple<string, int>>)level["directions"];
