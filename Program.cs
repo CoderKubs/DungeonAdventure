@@ -13,6 +13,7 @@ using System.Xml;
 
 public class Program
 {
+    public static List<CharacterStats> fightingBots = new List<CharacterStats>();
     public static int currentLevel;
     public static char lastTile = ' ';
 
@@ -173,7 +174,7 @@ public class Program
             DisplayLevel(level,playerChar);
 
             if (fighting == false){
-                //asks if they want to move and move
+                //asks if they want to move, then move
                 moving = false;
                 Console.WriteLine("What do you want to do?");
                 string output = GetWhatToDo();
@@ -215,10 +216,8 @@ public class Program
 
 
                         MoveBots(level,playerChar);
-                        (bool botNearby, botChar) = CheckIfBotNearby(level, playerChar);
-
-                        if(botNearby){
-                            fighting = true;
+                        fighting = CheckIfBotNearby(level, playerChar);
+                        if(fighting){
                             break;
                         }
                     }while(moving);
@@ -227,7 +226,7 @@ public class Program
             } else { //Fighting = true!
                 //repeat until not fighting
                 do{
-                    Fighting(level,botChar);
+                    fighting = Fighting(level, playerChar);
                 }while(fighting);
             }
 
@@ -236,29 +235,38 @@ public class Program
     }
 
     //What happens during the fighting stage
-    static void Fighting(Dictionary<string,object> level, char botChar){
-        
+    static bool Fighting(Dictionary<string,object> level, char playerChar){
+
+        Console.Clear();
+        DisplayLevel(level, playerChar);
+
         //Show the stats of you and the enemy
         Console.WriteLine("\n        FIGHT!");
         Console.WriteLine("You:");
         Console.WriteLine($"Health:{playerStats.health}     Power:{playerStats.strength}");
 
-        List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
-        int indexOfBot = bots.FindIndex(bot => bot.Char == botChar);
+        
+        //display each enemys stats
+        foreach(CharacterStats bot in fightingBots){
 
-        int botHealth = bots[indexOfBot].Health;
-        int botStrength = bots[indexOfBot].Strength;
+            char botChar = bot.Char;
+            int indexOfBot = fightingBots.FindIndex(bot => bot.Char == botChar);
+            int botHealth = fightingBots[indexOfBot].Health;
+            int botStrength = fightingBots[indexOfBot].Strength;
 
 
-        Console.WriteLine($"\nEnemy: {indexOfBot+1}");
-        Console.WriteLine($"health:{botHealth}     Power:{botStrength}");
+            Console.WriteLine($"\nEnemy: {indexOfBot+1}");
+            Console.WriteLine($"health:{botHealth}     Power:{botStrength}");
+        }
 
-        (CharacterStats bot, bool victory) = PlayerTurn(bot, botStrength);
-        if(botHealth == 0){
-            return;
+
+        // do the players turn, check if he won, if not, do the bots turn
+        bool fighting = PlayerTurn(level);
+        if (!fighting){
+            return fighting;
         }
         BotTurn();
-
+        return fighting;
     }
 
     //The bots turn for attacking
@@ -266,27 +274,94 @@ public class Program
 
     }
 
-    //The players turn for attacking
-    static (int,int,bool) PlayerTurn(int botHealth, int botStrength){
-        do{
-            string input = GetWhatToDo();
-            if(input.ToLower() == "attack"){
-                botHealth -= playerStats.strength;
-                Console.WriteLine(playerStats.strength);
-                if (botHealth < 0){
-                    botHealth = 0;
-                }
-                return (botHealth,botStrength,true);
-            } else if(input.ToLower() == "run") {
+static bool PlayerTurn(Dictionary<string, object> level)
+{
+    bool fighting = true;
+    Console.WriteLine("\nWhat action do you want to do?");
+    string input = GetWhatToDo();
 
+    if (input.ToLower() == "attack")
+    {
+        if (fightingBots.Count == 1)
+        {
+            CharacterStats enemy = fightingBots[0]; // Get the enemy into a variable
+            enemy.Health -= playerStats.strength;   // Modify the enemy's health
+            fightingBots[0] = enemy; // Put the modified enemy back into the list
+
+            if (enemy.Health <= 0)
+            {
+                MoveCharToPlace(level, enemy.Char, "gone", ' ');
+                fightingBots.Remove(enemy);
+                fighting = false;
+                 if (level.ContainsKey("bots") && level["bots"] is List<CharacterStats> botsList)
+                        {
+                            int indexToUpdate = 0; // Adjust for 0-based index
+                            CharacterStats botToUpdate = botsList[indexToUpdate];
+                            botToUpdate.Health = 0; // Update the bot's health
+
+                            // Assign the modified bot back to the list
+                            botsList[indexToUpdate] = botToUpdate;
+
+                            level["bots"] = botsList; // Update the list in the dictionary
+                        }
             }
-        }while(true);
+        }
+        else
+        {
+            Console.WriteLine("Which enemy do you want to attack?");
+            int whichBotToFight;
+
+            do
+            {
+                input = GetWhatToDo();
+
+                if (int.TryParse(input, out whichBotToFight) && whichBotToFight >= 1 && whichBotToFight <= fightingBots.Count)
+                {
+                    CharacterStats enemy = fightingBots[whichBotToFight - 1]; // Get the enemy into a variable
+                    enemy.Health -= playerStats.strength;   // Modify the enemy's health
+                    fightingBots[whichBotToFight - 1] = enemy; // Put the modified enemy back into the list
+
+                    if (enemy.Health <= 0)
+                    {
+                        fightingBots.RemoveAt(whichBotToFight - 1);
+
+                        if (level.ContainsKey("bots") && level["bots"] is List<CharacterStats> botsList)
+                        {
+                            int indexToUpdate = whichBotToFight - 1; // Adjust for 0-based index
+                            CharacterStats botToUpdate = botsList[indexToUpdate];
+                            botToUpdate.Health = 0; // Update the bot's health
+
+                            // Assign the modified bot back to the list
+                            botsList[indexToUpdate] = botToUpdate;
+
+                            level["bots"] = botsList; // Update the list in the dictionary
+                        }
+                    }
+
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid integer between 1 and " + fightingBots.Count + ".");
+                }
+
+            } while (true);
+        }
     }
+    else if (input.ToLower() == "run")
+    {
+        // Handle the "run" action here
+    }
+
+    return fighting;
+}
 
 
 
     //A method that checks if any bots are near the player, Returns true or false
-    static (bool,char) CheckIfBotNearby(Dictionary<string,object> level,char playerChar){
+    static bool CheckIfBotNearby(Dictionary<string,object> level,char playerChar){
+
+        bool fighting = false;
 
         //find player position
         int[] playerPosition = FindPlayer(level, playerChar);
@@ -295,6 +370,7 @@ public class Program
         List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
 
         foreach(CharacterStats bot in bots){
+
             //Set botChar to the character that the bot represents
             char botChar = bot.Char;
 
@@ -306,10 +382,12 @@ public class Program
             // Check if the bot is within one space of the player
            if ((horizontalDistance == 1 && verticalDistance == 0) || (horizontalDistance == 0 && verticalDistance == 1))
             {
-                return (true, botChar);
+                fightingBots.Add(bot);
+                fighting = true;
             }
         }
-        return (false, '.');
+
+        return fighting;
     }
 
 
@@ -322,59 +400,59 @@ public class Program
         
         List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
         foreach(CharacterStats bot in bots){
+            if (bot.Health != 0){
+                //break apart the bots info
+                string direction = bot.Direction;
+                char standingOnWhat = bot.StandingOn;
+                bool chasingPlayer = bot.IsChasing;
+                char botChar = bot.Char;
 
-            //break apart the bots info
-            string direction = bot.Direction;
-            char standingOnWhat = bot.StandingOn;
-            bool chasingPlayer = bot.IsChasing;
-            char botChar = bot.Char;
+                if(chasingPlayer){
 
-            if(chasingPlayer){
+                } else{
 
-            } else{
+                    // Wandering ai
+                    int [] botPosition = FindPlayer(level, botChar);
+                    Tuple<bool,int> checkMovement = CheckPlayerMovement(botPosition[0], botPosition[1], level, direction);
+                    bool successful = checkMovement.Item1;
 
-                // Wandering ai
-                int [] botPosition = FindPlayer(level, botChar);
-                Tuple<bool,int> checkMovement = CheckPlayerMovement(botPosition[0], botPosition[1], level, direction);
-                bool successful = checkMovement.Item1;
+                    if(successful){
+                        standingOnWhat = MoveCharToPlace(level, botChar, direction, standingOnWhat);
+                    } else {
 
-                if(successful){
-                    standingOnWhat = MoveCharToPlace(level, botChar, direction, standingOnWhat);
-                } else {
-
-                    // Rotate the direction 90 degrees clockwise using a switch
-                    switch (direction)
-                    {
-                        case "up":
-                            direction = "right";
-                            break;
-                        case "right":
-                            direction = "down";
-                            break;
-                        case "down":
-                            direction = "left";
-                            break;
-                        case "left":
-                            direction = "up";
-                            break;
+                        // Rotate the direction 90 degrees clockwise using a switch
+                        switch (direction)
+                        {
+                            case "up":
+                                direction = "right";
+                                break;
+                            case "right":
+                                direction = "down";
+                                break;
+                            case "down":
+                                direction = "left";
+                                break;
+                            case "left":
+                                direction = "up";
+                                break;
+                        }
                     }
+                        // Create an updated Tuple with the new direction and add it to the updatedBots list
+                        updatedBots.Add(new CharacterStats
+                    {
+                        Char = botChar,
+                        Direction = direction,
+                        StandingOn = standingOnWhat,
+                        IsChasing = chasingPlayer,
+                        Health = bot.Health, // You can access health and strength directly from the bot object
+                        Strength = bot.Strength
+                    });
+
                 }
-                // Create an updated Tuple with the new direction and add it to the updatedBots list
-                updatedBots.Add(new CharacterStats
-            {
-                Char = botChar,
-                Direction = direction,
-                StandingOn = standingOnWhat,
-                IsChasing = chasingPlayer,
-                Health = bot.Health, // You can access health and strength directly from the bot object
-                Strength = bot.Strength
-            });
 
+                // Replace the original 'bots' list with the updated 'updatedBots' list
+                level["bots"] = updatedBots;
             }
-
-            // Replace the original 'bots' list with the updated 'updatedBots' list
-            level["bots"] = updatedBots;
-
         }
 
     }
@@ -391,7 +469,7 @@ public class Program
     }
 
 
-    //asks the player where to go and checks if its valid. If it is, move them there.
+//asks the player where to go and checks if its valid. If it is, move them there.
     static (int, bool) MoveCharacter(Dictionary<string,object> levels,char playerChar){
 
             Dictionary<string, object> level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
@@ -502,6 +580,7 @@ static char MoveCharToPlace(Dictionary<string, object> level, char thingToMove, 
 
 
 
+
 static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int newLevelNumber, int y, int x, char playerChar)
 {
     // Get the new level
@@ -553,7 +632,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
     }
 
 
-    //inputs y and x position of object, level, direction object is trying to go.
+     //inputs y and x position of object, level, direction object is trying to go.
     //outputs, is it valid?, level to swap to if you want to do that 
     static Tuple<bool,int> CheckPlayerMovement(int y , int x, Dictionary<string, object> level, string direction)
         {
