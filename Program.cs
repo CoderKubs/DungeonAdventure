@@ -3,6 +3,7 @@
 
 
 //Level 1 dictionary holding the level info
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.Numerics;
@@ -13,11 +14,23 @@ using System.Xml;
 
 public class Program
 {
+    public static string enemyAttackInfo = "";
+    public static Random rand = new Random();
     public static List<CharacterStats> fightingBots = new List<CharacterStats>();
     public static int currentLevel;
     public static char lastTile = ' ';
 
-    public static (int health, int strength) playerStats = (100, 50);
+    public static CharacterStats playerStats = new CharacterStats
+                    {
+                        Char = 'o',
+                        Direction = "north",
+                        StandingOn = lastTile,
+                        IsChasing = false,
+                        Health = 100,
+                        Strength = 50,
+                        Armor = 10,
+                        Weapons = new List<(string,string)> {("Punch","1d2")}
+                    };
     public static void Main(){
 
         
@@ -58,8 +71,8 @@ public class Program
                             },
                             { "bots", new List<CharacterStats>()
                                 {
-                                    new CharacterStats { Char = '1', Direction = "up", StandingOn = ' ', IsChasing = false, Health = 50, Strength = 10 },
-                                    new CharacterStats { Char = '2', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 50, Strength = 10 },
+                                    new CharacterStats { Char = '1', Direction = "up", StandingOn = ' ', IsChasing = false, Health = 4, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
+                                    new CharacterStats { Char = '2', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 2, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
                                 }
                             }
                         }
@@ -161,6 +174,7 @@ public class Program
 
         Console.BackgroundColor = ConsoleColor.Black;
         Console.Clear();
+        Console.ForegroundColor = ConsoleColor.White;
 
         //
         //Main game
@@ -216,7 +230,8 @@ public class Program
 
 
                         MoveBots(level,playerChar);
-                        fighting = CheckIfBotNearby(level, playerChar);
+                        fighting = CheckIfBotNearby(level, playerChar,fighting);
+
                         if(fighting){
                             break;
                         }
@@ -224,6 +239,7 @@ public class Program
                 
                 }
             } else { //Fighting = true!
+
                 //repeat until not fighting
                 do{
                     fighting = Fighting(level, playerChar);
@@ -240,24 +256,56 @@ public class Program
         Console.Clear();
         DisplayLevel(level, playerChar);
 
-        //Show the stats of you and the enemy
+                                                        // Show player stats
         Console.WriteLine("\n        FIGHT!");
         Console.WriteLine("You:");
-        Console.WriteLine($"Health:{playerStats.health}     Power:{playerStats.strength}");
-
-        
-        //display each enemys stats
-        foreach(CharacterStats bot in fightingBots){
-
-            char botChar = bot.Char;
-            int indexOfBot = fightingBots.FindIndex(bot => bot.Char == botChar);
-            int botHealth = fightingBots[indexOfBot].Health;
-            int botStrength = fightingBots[indexOfBot].Strength;
-
-
-            Console.WriteLine($"\nEnemy: {indexOfBot+1}");
-            Console.WriteLine($"health:{botHealth}     Power:{botStrength}");
+        Console.Write("Health: ");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write(playerStats.Health);
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write("    Weapons ");
+        Console.ForegroundColor = ConsoleColor.Red;
+        foreach ((string, string) weapon in playerStats.Weapons)
+        {
+            Console.Write($"--{weapon.Item1} {weapon.Item2} ");
         }
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write("    Armor Class: ");
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write(playerStats.Armor);
+        Console.ForegroundColor = ConsoleColor.White;
+
+                                                    // Display each enemy's stats
+        foreach (CharacterStats bot in fightingBots)
+        {
+            char botChar = bot.Char;
+
+            Console.Write("\n\nEnemy: ");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write(botChar.ToString() + "\n");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Health: ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(bot.Health);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("    Weapons ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            foreach ((string, string) weapon in bot.Weapons)
+            {
+                Console.Write($"--{weapon.Item1} {weapon.Item2} ");
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("    Armor Class: ");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(bot.Armor);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine();
+        }
+
+        //Display how much damage the enemy did
+        Console.WriteLine();
+        Console.WriteLine(enemyAttackInfo);
+        enemyAttackInfo = "";
 
 
         // do the players turn, check if he won, if not, do the bots turn
@@ -265,103 +313,232 @@ public class Program
         if (!fighting){
             return fighting;
         }
-        BotTurn();
+        List<CharacterStats> tempFightingBots = new List<CharacterStats> (fightingBots);
+
+        CheckIfBotNearby(level, playerChar, true);
+        foreach(CharacterStats bot in tempFightingBots){
+            BotTurn(level, playerChar, bot);
+        }
+
+        MoveBots(level, playerChar);
         return fighting;
     }
 
     //The bots turn for attacking
-    static void BotTurn(){
+    static void BotTurn(Dictionary<string, object> level, char playerChar, CharacterStats bot){
+        CheckIfBotNearby(level, bot.Char, true);
+
+        (string, string) randomWeapon = bot.Weapons[rand.Next(bot.Weapons.Count)];
+        int damage = RollDice(randomWeapon.Item2);
+
+        //Calculate armor class and deal less damage depending
+        int roll = RollDice("1d20");
+        if(roll > playerStats.Armor){
+            enemyAttackInfo += $"enemy {bot.Char} strikes with his {randomWeapon.Item1.ToLower()} dealing {damage} damage\n";
+            playerStats.Health -= damage; //Normal Damage
+        } else {
+            enemyAttackInfo += $"enemy {bot.Char} strikes with his {randomWeapon.Item1.ToLower()}. Your armor absorbes some of the impact and he deals {damage/2} damage\n";
+            playerStats.Health -= damage/2; //Half Damage
+        }
+        
+        
 
     }
 
-static bool PlayerTurn(Dictionary<string, object> level)
+static bool DamageBot(Dictionary<string, object> level, char botChar, int damage)
 {
+
+    int botID = fightingBots.FindIndex(bot => bot.Char == botChar );
     bool fighting = true;
-    Console.WriteLine("\nWhat action do you want to do?");
-    string input = GetWhatToDo();
 
-    if (input.ToLower() == "attack")
-    {
-        if (fightingBots.Count == 1)
+    CharacterStats enemy = fightingBots[botID];
+    int newHealth = enemy.Health - damage;
+
+    enemy.Health = newHealth;
+
+    //update the health
+    List<CharacterStats> fightingBotsUpdatedHealth = new List<CharacterStats>();;
+    foreach (CharacterStats fightingBot in fightingBots)
         {
-            CharacterStats enemy = fightingBots[0]; // Get the enemy into a variable
-            enemy.Health -= playerStats.strength;   // Modify the enemy's health
-            fightingBots[0] = enemy; // Put the modified enemy back into the list
-
-            if (enemy.Health <= 0)
+            CharacterStats botWithUpdatedHealth = fightingBot;
+            if (fightingBot.Char == enemy.Char)
             {
-                MoveCharToPlace(level, enemy.Char, "gone", ' ');
-                fightingBots.Remove(enemy);
-                fighting = false;
-                 if (level.ContainsKey("bots") && level["bots"] is List<CharacterStats> botsList)
-                        {
-                            int indexToUpdate = 0; // Adjust for 0-based index
-                            CharacterStats botToUpdate = botsList[indexToUpdate];
-                            botToUpdate.Health = 0; // Update the bot's health
+                botWithUpdatedHealth.Health -= damage;
+                if (botWithUpdatedHealth.Health <= 0){
 
-                            // Assign the modified bot back to the list
-                            botsList[indexToUpdate] = botToUpdate;
+                    //If the bot is dead, remove it
+                    botWithUpdatedHealth.Health = 0;
+                    MoveCharToPlace(level, enemy.Char, "gone", ' ');
+                }
+            }
 
-                            level["bots"] = botsList; // Update the list in the dictionary
-                        }
+            fightingBotsUpdatedHealth.Add(botWithUpdatedHealth);
+        }
+
+    //update the fightingBots list
+    fightingBots = fightingBotsUpdatedHealth;
+
+
+    if (enemy.Health <= 0)
+    {
+        
+
+        CharacterStats botToRemove = enemy;
+
+        foreach (CharacterStats fightingBot in fightingBots)
+        {
+            if (fightingBot.Char == enemy.Char)
+            {
+                botToRemove = fightingBot;
+                break; // Exit the loop once the bot is found
             }
         }
-        else
+
+
+        fightingBots.Remove(botToRemove);
+
+        newHealth = 0;
+
+        if (fightingBots.Count == 0)
         {
-            Console.WriteLine("Which enemy do you want to attack?");
-            int whichBotToFight;
-
-            do
-            {
-                input = GetWhatToDo();
-
-                if (int.TryParse(input, out whichBotToFight) && whichBotToFight >= 1 && whichBotToFight <= fightingBots.Count)
-                {
-                    CharacterStats enemy = fightingBots[whichBotToFight - 1]; // Get the enemy into a variable
-                    enemy.Health -= playerStats.strength;   // Modify the enemy's health
-                    fightingBots[whichBotToFight - 1] = enemy; // Put the modified enemy back into the list
-
-                    if (enemy.Health <= 0)
-                    {
-                        fightingBots.RemoveAt(whichBotToFight - 1);
-
-                        if (level.ContainsKey("bots") && level["bots"] is List<CharacterStats> botsList)
-                        {
-                            int indexToUpdate = whichBotToFight - 1; // Adjust for 0-based index
-                            CharacterStats botToUpdate = botsList[indexToUpdate];
-                            botToUpdate.Health = 0; // Update the bot's health
-
-                            // Assign the modified bot back to the list
-                            botsList[indexToUpdate] = botToUpdate;
-
-                            level["bots"] = botsList; // Update the list in the dictionary
-                        }
-                    }
-
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid integer between 1 and " + fightingBots.Count + ".");
-                }
-
-            } while (true);
+            fighting = false;
         }
     }
-    else if (input.ToLower() == "run")
+
+
+    if (level.ContainsKey("bots") && level["bots"] is List<CharacterStats> botsList1)
     {
-        // Handle the "run" action here
+        // Find the index of the bot in the list
+        int indexToUpdate = botsList1.FindIndex(bot => bot.Char == enemy.Char);
+
+        if (indexToUpdate >= 0)
+        {
+            CharacterStats botToUpdate = botsList1[indexToUpdate];
+            botToUpdate.Health = 0; // Update the bot's health
+
+            // Assign the modified bot back to the list
+            botsList1[indexToUpdate] = botToUpdate;
+
+            // Update the list in the dictionary
+            level["bots"] = botsList1;
+        }
     }
+
+
+
 
     return fighting;
 }
 
+    static bool PlayerTurn(Dictionary<string, object> level)
+    {
+        bool fighting = true;
+        Console.WriteLine("\nWhat do you do?");
+        Console.WriteLine("\"h\" for help");
+        string input = GetWhatToDo();
+
+        if (input.ToLower() == "attack")
+        {
+
+            //print choose a weapon
+            Console.WriteLine("\nChoose a weapon:");
+            List<string> choices = new List<string>();
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            //Show each weapon and add it to the list of choices
+            foreach((string,string) weapon in playerStats.Weapons){
+                Console.WriteLine("-"+weapon.Item1 + " " + weapon.Item2);
+                string name = weapon.Item1;
+                choices.Add(name.ToLower());
+            }
+            Console.ForegroundColor = ConsoleColor.White;
+
+            //Get a valid input
+            while(true){
+                input = GetWhatToDo();
+                input = input.ToLower();
+                if(choices.Contains(input)){
+                    break;
+                } else {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Input Invalid. Try again.");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+
+            //find the damage
+            string diceToRoll = playerStats.Weapons.Find(w => w.Item1.ToLower() == input).Item2;
+            int damageToDeal = RollDice(diceToRoll);
+
+            if (fightingBots.Count == 1)
+            {
+                //Check if it hits by rolling 1d20 and comparing to the armor class
+                int roll = RollDice("1d20");
+                if(roll > fightingBots[0].Armor){
+                    enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
+                    fighting = DamageBot(level, fightingBots[0].Char, damageToDeal);
+                } else{
+                    enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
+                    fighting = DamageBot(level, fightingBots[0].Char, damageToDeal/2);
+                }
+
+                
+            }
+            else
+            {
+                Console.WriteLine("Which enemy do you want to attack?");
+                char whichBotToFight;
+
+                do
+                {
+                    input = GetWhatToDo();
+
+                    if (char.TryParse(input, out whichBotToFight) && whichBotToFight >= '1' && whichBotToFight <= (char)('0' + fightingBots.Count))
+                    {
+                        
+                        int roll = RollDice("1d20");
+                        if(roll > fightingBots[0].Armor){
+                            enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
+                            fighting = DamageBot(level, whichBotToFight, damageToDeal);
+                        } else{
+                            enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
+                            fighting = DamageBot(level, whichBotToFight, damageToDeal/2);
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Please enter a valid integer between '1' and " + (char)('0' + fightingBots.Count) + ".");
+                    }
+                } while (true);
+            }
+        }
+        else if (input.ToLower() == "run")
+        {
+            // Handle the "run" action here
+        }
+
+        return fighting;
+    }
+
+    static int RollDice(string diceToRoll){
+        string[] data = diceToRoll.Split("d");
+        int amountOfDice = Convert.ToInt32(data[0]);
+        int maxDamagePerDice = Convert.ToInt32(data[1]);
+
+        int sumOfDice = 0;
+        for(int i = 0; i < amountOfDice; i++){
+            sumOfDice += rand.Next(1,maxDamagePerDice+1);
+        }
+
+        return sumOfDice;
+    }
+
+//A method that checks if any bots are near the player, Returns true or false
+//#CheckIfBotNearby
+    static bool CheckIfBotNearby(Dictionary<string,object> level,char playerChar, bool fighting){
 
 
-    //A method that checks if any bots are near the player, Returns true or false
-    static bool CheckIfBotNearby(Dictionary<string,object> level,char playerChar){
-
-        bool fighting = false;
 
         //find player position
         int[] playerPosition = FindPlayer(level, playerChar);
@@ -381,8 +558,16 @@ static bool PlayerTurn(Dictionary<string, object> level)
 
             // Check if the bot is within one space of the player
            if ((horizontalDistance == 1 && verticalDistance == 0) || (horizontalDistance == 0 && verticalDistance == 1))
-            {
-                fightingBots.Add(bot);
+            {   
+                bool addBot = true;
+                foreach(CharacterStats fightingBot in fightingBots){
+                    if(fightingBot.Char == bot.Char){
+                        addBot = false;
+                    }
+                }
+                if(addBot){
+                    fightingBots.Add(bot);
+                }
                 fighting = true;
             }
         }
@@ -400,7 +585,8 @@ static bool PlayerTurn(Dictionary<string, object> level)
         
         List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
         foreach(CharacterStats bot in bots){
-            if (bot.Health != 0){
+
+            if (bot.Health != 0 && !fightingBots.Contains(bot)){
                 //break apart the bots info
                 string direction = bot.Direction;
                 char standingOnWhat = bot.StandingOn;
@@ -445,7 +631,9 @@ static bool PlayerTurn(Dictionary<string, object> level)
                         StandingOn = standingOnWhat,
                         IsChasing = chasingPlayer,
                         Health = bot.Health, // You can access health and strength directly from the bot object
-                        Strength = bot.Strength
+                        Strength = bot.Strength,
+                        Armor = bot.Armor,
+                        Weapons = bot.Weapons
                     });
 
                 }
@@ -632,6 +820,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
     }
 
 
+
      //inputs y and x position of object, level, direction object is trying to go.
     //outputs, is it valid?, level to swap to if you want to do that 
     static Tuple<bool,int> CheckPlayerMovement(int y , int x, Dictionary<string, object> level, string direction)
@@ -643,7 +832,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (y + 1 < levelLayout.Length)
                 {
-                    if (levelLayout[y+1][x] == 'x'){
+                    if (levelLayout[y+1][x] == 'o' || levelLayout[y+1][x] == '1' || levelLayout[y+1][x] == '2' || levelLayout[y+1][x] == '3' || levelLayout[y+1][x] == '4' || levelLayout[y+1][x] == 'x'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -657,7 +846,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (y - 1 >= 0)
                 {
-                    if (levelLayout[y-1][x] == 'x'){
+                    if (levelLayout[y-1][x] == 'o' || levelLayout[y-1][x] == '1' || levelLayout[y-1][x] == '2' || levelLayout[y-1][x] == '3' || levelLayout[y-1][x] == '4' || levelLayout[y-1][x] == 'x'){
                         return Tuple.Create(false, currentLevel);;
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -670,7 +859,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (x - 1 >= 0)
                 {
-                    if (levelLayout[y][x-1] == 'x'){
+                    if (levelLayout[y][x-1] == 'o' || levelLayout[y][x-1] == '1' || levelLayout[y][x-1] == '2' || levelLayout[y][x-1] == '3' || levelLayout[y][x-1] == '4' || levelLayout[y][x-1] == 'x'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -683,7 +872,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (x + 1 < levelLayout[y].Length)
                 {
-                    if (levelLayout[y][x+1] == 'x'){
+                    if (levelLayout[y][x+1] == 'o' || levelLayout[y][x+1] == '1' || levelLayout[y][x+1] == '2' || levelLayout[y][x+1] == '3' || levelLayout[y][x+1] == '4' || levelLayout[y][x+1] == 'x'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -759,7 +948,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             }
             Console.WriteLine();
         }
-        Console.ForegroundColor = ConsoleColor.Black;
+        Console.ForegroundColor = ConsoleColor.White;
         Console.BackgroundColor = ConsoleColor.Black;
     }
 }
@@ -774,9 +963,10 @@ public struct CharacterStats
     public int Health { get; set; }
 
     public int Strength { get; set; }
-
+    public int Armor { get; set; }
+    public List<(string,string)> Weapons {get; set; }
 
 
     // Add constructor and methods as needed
-    //Make sure to change the MoveBots method to reflect changes
+    //Make sure to change the MoveBots method to reflect changes AND the playerstats at the top of this file
 }
