@@ -13,7 +13,8 @@ using System.Runtime.InteropServices;
 using System.Xml;
 
 public class Program
-{
+{   
+    public static (string,string)[] basicChestLoot = new (string,string)[2] {("Sword", "1d6"),("Knife", "2d4")};
     public static string enemyAttackInfo = "";
     public static Random rand = new Random();
     public static List<CharacterStats> fightingBots = new List<CharacterStats>();
@@ -46,19 +47,18 @@ public class Program
                             },
                             { "map", new char[][]
                                 {
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
-                                    new char[] { ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
-                                    new char[] { ' ', '2', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', ' '},
-                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x'},
-                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', ' ', 'o', 'x'},
-                                    new char[] { 'x', '1', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', 'o', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' }
                                     }
-
                             },
                             { "directions", new List<Tuple<string, int>>
                                 {
@@ -71,8 +71,8 @@ public class Program
                             },
                             { "bots", new List<CharacterStats>()
                                 {
-                                    new CharacterStats { Char = '1', Direction = "up", StandingOn = ' ', IsChasing = false, Health = 4, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
-                                    new CharacterStats { Char = '2', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 2, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
+                                    //new CharacterStats { Char = '1', Direction = "up", StandingOn = ' ', IsChasing = false, Health = 4, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
+                                    //new CharacterStats { Char = '2', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 2, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
                                 }
                             }
                         }
@@ -88,23 +88,24 @@ public class Program
                             },
                             { "map", new char[][]
                                 {
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' '},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' '},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
                                     }
 
                             },
                             { "directions", new List<Tuple<string, int>>
                                 {
                                     Tuple.Create("north", 1),
-                                    Tuple.Create("south", 2),
+                                    Tuple.Create("south", 3),
                                     Tuple.Create("east", 1),
                                     Tuple.Create("west", 2)
                                 }
@@ -128,22 +129,23 @@ public class Program
                             },
                             { "map", new char[][]
                                 {
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', '.', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' '},
-                                    new char[] { ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' '},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
                                     }
 
                             },
                             { "directions", new List<Tuple<string, int>>
                                 {
-                                    Tuple.Create("north", 1),
+                                    Tuple.Create("north", 2),
                                     Tuple.Create("south", 2),
                                     Tuple.Create("east", 1),
                                     Tuple.Create("west", 1)
@@ -191,9 +193,10 @@ public class Program
                 //asks if they want to move, then move
                 moving = false;
                 Console.WriteLine("What do you want to do?");
+                Console.WriteLine("\"h\" for help");
                 string output = GetWhatToDo();
 
-                if(output.ToLower() == "move"){
+                if(output.ToLower() == "move"|| output.ToLower() == "m"){
                     //Enters move character mode and it wont exit until you press escape.
                     moving = true;
                     int pastMovesStopped = 0;
@@ -235,8 +238,20 @@ public class Program
                         if(fighting){
                             break;
                         }
+
+                        if(lastTile == '.'){
+                            lastTile = ' ';
+                            PickUpLoot('.');
+                        }
                     }while(moving);
                 
+                } else if(output.ToLower() == "h" || output.ToLower() == "help"){
+                    Console.WriteLine();
+                    Console.WriteLine(@"Here are all the possible actions:");
+                    Console.WriteLine("'i' for inventory");
+                    Console.WriteLine("'m' to move around using the arrow keys");
+                    Console.WriteLine("press any button to continue");
+                    Console.ReadKey(true);
                 }
             } else { //Fighting = true!
 
@@ -244,6 +259,9 @@ public class Program
                 do{
                     fighting = Fighting(level, playerChar);
                 }while(fighting);
+
+                fightingBots.Clear();
+                
             }
 
 
@@ -317,6 +335,7 @@ public class Program
 
         CheckIfBotNearby(level, playerChar, true);
         foreach(CharacterStats bot in tempFightingBots){
+
             BotTurn(level, playerChar, bot);
         }
 
@@ -357,7 +376,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
     enemy.Health = newHealth;
 
     //update the health
-    List<CharacterStats> fightingBotsUpdatedHealth = new List<CharacterStats>();;
+    List<CharacterStats> fightingBotsUpdatedHealth = new List<CharacterStats>();
     foreach (CharacterStats fightingBot in fightingBots)
         {
             CharacterStats botWithUpdatedHealth = fightingBot;
@@ -399,10 +418,6 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
 
         newHealth = 0;
 
-        if (fightingBots.Count == 0)
-        {
-            fighting = false;
-        }
     }
 
 
@@ -422,10 +437,14 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
             // Update the list in the dictionary
             level["bots"] = botsList1;
         }
+        
     }
+    
 
-
-
+    if (fightingBots.Count == 0)
+    {
+        fighting = false;
+    }
 
     return fighting;
 }
@@ -515,7 +534,34 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
         }
         else if (input.ToLower() == "run")
         {
-            // Handle the "run" action here
+
+            List<CharacterStats> botsList = (List<CharacterStats>)level["bots"];
+            List<CharacterStats> updatedBotsList = new List<CharacterStats>(botsList.Count);
+            
+
+            foreach (CharacterStats bot in botsList)
+            {
+                bool updated = false;
+                foreach (CharacterStats enemy in fightingBots)
+                {
+
+                    if (bot.Char == enemy.Char)
+                    {
+                        updatedBotsList.Add(enemy);
+                        updated = true;
+                        break;
+                    }
+                }
+
+                if (!updated)
+                {
+                    updatedBotsList.Add(bot);
+                }
+            }
+
+            level["bots"] = updatedBotsList; // Update the list in the dictionary
+            
+            fighting = false;
         }
 
         return fighting;
@@ -584,19 +630,20 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
         List<CharacterStats> updatedBots = new List<CharacterStats>();
         
         List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
+
         foreach(CharacterStats bot in bots){
 
-            if (bot.Health != 0 && !fightingBots.Contains(bot)){
-                //break apart the bots info
-                string direction = bot.Direction;
-                char standingOnWhat = bot.StandingOn;
-                bool chasingPlayer = bot.IsChasing;
-                char botChar = bot.Char;
+            //break apart the bots info
+            string direction = bot.Direction;
+            char standingOnWhat = bot.StandingOn;
+            bool chasingPlayer = bot.IsChasing;
+            char botChar = bot.Char;
 
+            if (bot.Health != 0 && !fightingBots.Contains(bot)){
                 if(chasingPlayer){
 
                 } else{
-
+                    
                     // Wandering ai
                     int [] botPosition = FindPlayer(level, botChar);
                     Tuple<bool,int> checkMovement = CheckPlayerMovement(botPosition[0], botPosition[1], level, direction);
@@ -623,25 +670,27 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                                 break;
                         }
                     }
-                        // Create an updated Tuple with the new direction and add it to the updatedBots list
-                        updatedBots.Add(new CharacterStats
-                    {
-                        Char = botChar,
-                        Direction = direction,
-                        StandingOn = standingOnWhat,
-                        IsChasing = chasingPlayer,
-                        Health = bot.Health, // You can access health and strength directly from the bot object
-                        Strength = bot.Strength,
-                        Armor = bot.Armor,
-                        Weapons = bot.Weapons
-                    });
+                
+                }    
 
-                }
-
-                // Replace the original 'bots' list with the updated 'updatedBots' list
-                level["bots"] = updatedBots;
             }
+
+             // Create an updated Tuple with the new direction and add it to the updatedBots list
+            updatedBots.Add(new CharacterStats
+            {
+                Char = botChar,
+                Direction = direction,
+                StandingOn = standingOnWhat,
+                IsChasing = chasingPlayer,
+                Health = bot.Health, // You can access health and strength directly from the bot object
+                Strength = bot.Strength,
+                Armor = bot.Armor,
+                Weapons = bot.Weapons
+            });
+
         }
+        // Replace the original 'bots' list with the updated 'updatedBots' list
+        level["bots"] = updatedBots;
 
     }
 
@@ -723,7 +772,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                     
                     //sets the player location on the old map to " " and adds it to the new map
                     levelLayout[playerLocation[0]][playerLocation[1]] = ' ';
-                    SetNewLevelPlayerPosition(levels, newLevelNumber, newLevelLayout.Length, playerLocation[1] , playerChar);
+                    SetNewLevelPlayerPosition(levels, newLevelNumber, newLevelLayout.Length-1, playerLocation[1] , playerChar);
                 }
 
             } else if(keyInfo.Key == ConsoleKey.Escape){
@@ -901,6 +950,11 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         }
     }
 
+    static void PickUpLoot(char lootType){
+        if(lootType == '.'){ // basic chest
+            (string, string) weapon = basicChestLoot[rand.Next(0,basicChestLoot.Length)];
+        }
+    }
 
 
     static void DisplayLevel(Dictionary<string, object> level,char playerChar){
@@ -921,6 +975,15 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
                     Console.BackgroundColor = ConsoleColor.DarkGray;
                     Console.Write("  ");
+
+                } else
+                if(tile == '.'){
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write("o ");
+                    Console.ForegroundColor = ConsoleColor.White;
+
 
                 } else
                 if(tile == playerChar){
@@ -952,6 +1015,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         Console.BackgroundColor = ConsoleColor.Black;
     }
 }
+
 
 
 public struct CharacterStats
