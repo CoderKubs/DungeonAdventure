@@ -3,10 +3,12 @@
 
 
 //Level 1 dictionary holding the level info
+using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.Numerics;
+using System.Reflection.Emit;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -43,7 +45,18 @@ public class Program
                         Weapons = new List<(string,string)> {("Punch","1d2")}
                     };
     public static void Main(){
+        /*
+        Level Key:
 
+        x = wall
+        o = player spawn
+        " " = nothing
+        , = basic chest to spawn like " o"
+        . = basic chest to spawn like "o "
+        numbers = enemy location (Make sure to add the enemy to the list)
+        w = water
+
+        */
         
         Dictionary<string, object> levels = new Dictionary<string, object>
                 {
@@ -56,7 +69,7 @@ public class Program
                                 }
                             },
                             { "map", new char[][]
-                                {
+                                {   /*
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
@@ -69,6 +82,19 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' }
                                     }
+                                    */
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', 'o', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' }
+                                }
                             },
                             { "directions", new List<Tuple<string, int>>
                                 {
@@ -92,7 +118,8 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\nYou come to a crossroads",
+                                    "\nThe trail splits.",
+                                    "You can hear something to the right ->, but the path to the left <- is dead silent",
                                     "\nWhich way will you go?",
                                 }
                             },
@@ -102,13 +129,13 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     }
 
                             },
@@ -133,20 +160,20 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\nYou see a room with guards patroling the area",
+                                    "\nYou see a room patrolled by guards",
                                     "\nYou probably shouldn't take them on with your bare fists",
                                 }
                             },
                             { "map", new char[][]
                                 {
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', '.', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ',', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', 'x', ' ', 'x', ' ', 'x', 'x'},
-                                    new char[] { ' ', ' ', ' ', ' ', ' ', ' ', 'x', '.', 'x', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', '1', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', '1', ' ', ' ', ' ', '2', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', 'x', ' ', 'x', ' ', 'x', ' ', 'x'},
+                                    new char[] { ' ', ' ', ' ', ' ', ' ', 'x', '.', 'x', ' ', ' ', ' ', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     }
@@ -204,7 +231,11 @@ public class Program
                 //asks if they want to move, then move
                 moving = false;
                 Console.WriteLine("What do you want to do?");
-                Console.WriteLine("\"h\" for help");
+                Console.WriteLine(); // New line
+                Console.ForegroundColor = ConsoleColor.Blue; // Set text color to blue
+                Console.Write("h");
+                Console.ForegroundColor = ConsoleColor.White; // Reset text color to white
+                Console.Write(" for help\n");
                 string output = GetWhatToDo();
 
                 if(output.ToLower() == "move"|| output.ToLower() == "m"){
@@ -260,11 +291,23 @@ public class Program
                 
                 } else if(output.ToLower() == "h" || output.ToLower() == "help"){
                     Console.WriteLine();
-                    Console.WriteLine(@"Here are all the possible actions:");
-                    Console.WriteLine("'i' for inventory");
-                    Console.WriteLine("'m' to move around using the arrow keys");
+
+                    Console.WriteLine("Here are all the possible actions:");
+
+
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("i");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(" for inventory\n");
+
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write("m");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(" to move around using the arrow keys\n");
+
                     Console.WriteLine("press any button to continue");
                     Console.ReadKey(true);
+
                 } else if(output.ToLower() == "i" || output.ToLower() == "inventory"){
 
                     //Show weapons
@@ -297,7 +340,7 @@ public class Program
 
                 //repeat until not fighting
                 do{
-                    fighting = Fighting(level, playerChar);
+                    fighting = Fighting(level, levels, playerChar);
                 }while(fighting);
 
                 fightingBots.Clear();
@@ -309,7 +352,7 @@ public class Program
     }
 
     //What happens during the fighting stage
-    static bool Fighting(Dictionary<string,object> level, char playerChar){
+    static bool Fighting(Dictionary<string,object> level,Dictionary<string,object> levels, char playerChar){
 
         Console.Clear();
         DisplayLevel(level, playerChar);
@@ -367,7 +410,7 @@ public class Program
 
 
         // do the players turn, check if he won, if not, do the bots turn
-        bool fighting = PlayerTurn(level);
+        bool fighting = PlayerTurn(level, levels ,playerChar);
         if (!fighting){
             return fighting;
         }
@@ -488,8 +531,8 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
 
     return fighting;
 }
-
-    static bool PlayerTurn(Dictionary<string, object> level)
+    //#PlayerTurn
+    static bool PlayerTurn(Dictionary<string, object> level, Dictionary<string,object> levels, char playerChar)
     {
         bool fighting = true;
         Console.WriteLine("\nWhat do you do?");
@@ -602,9 +645,11 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
             level["bots"] = updatedBotsList; // Update the list in the dictionary
             
             fighting = false;
+            MoveCharacter(levels, playerChar);
+            
         }
-
         return fighting;
+        
     }
 
     static int RollDice(string diceToRoll){
@@ -663,7 +708,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
 
 
 
-
+    //#MoveBots
     static void MoveBots(Dictionary<string,object> level, char playerChar){
         
         //Create a new list that will replace the bots list but with new positions
@@ -672,7 +717,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
         List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
 
         foreach(CharacterStats bot in bots){
-
+            
             //break apart the bots info
             string direction = bot.Direction;
             char standingOnWhat = bot.StandingOn;
@@ -680,8 +725,17 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
             char botChar = bot.Char;
 
             if (bot.Health != 0 && !fightingBots.Contains(bot)){
+
+                chasingPlayer = LookForPlayer(level, botChar, playerChar);
+
                 if(chasingPlayer){
 
+                    direction = FollowPlayer(level, botChar, playerChar);
+                    if(direction != "none"){
+                        standingOnWhat = MoveCharToPlace(level, botChar, direction, standingOnWhat);
+                    }
+
+                    chasingPlayer = LookForPlayer(level, botChar, playerChar);
                 } else{
                     
                     // Wandering ai
@@ -745,7 +799,138 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
         return output;
     }
 
+    // Function to check if the enemy can see the player using Bresenham's Line Algorithm
+    //#LookForPlayer
+    static bool LookForPlayer(Dictionary<string, object> level, char botChar, char playerChar)
+    {
+        int[] botPos = FindPlayer(level, botChar);
+        int botY = botPos[0];
+        int botX = botPos[1];
 
+        int[] playerPos = FindPlayer(level, playerChar);
+        int playerY = playerPos[0];
+        int playerX = playerPos[1];
+
+        int dx = Math.Abs(playerX - botX);
+        int dy = Math.Abs(playerY - botY);
+        int sx = botX < playerX ? 1 : -1;
+        int sy = botY < playerY ? 1 : -1;
+        int err = dx - dy;
+
+        char[][] map = (char[][])level["map"];
+        while (botX != playerX || botY != playerY)
+        {
+            if (map[botY][botX] == 'x')
+            {
+
+                return false;
+            }
+
+            int e2 = 2 * err;
+            if (e2 > -dy)
+            {
+                err -= dy;
+                botX += sx;
+            }
+            if (e2 < dx)
+            {
+                err += dx;
+                botY += sy;
+            }
+        }
+
+        return true;
+    }
+
+    //#FollowPlayer
+    //A method that moves a bot to the player via pathfinding
+    static string FollowPlayer(Dictionary<string, object> level, char botChar, char playerChar){
+        int[] botPos = FindPlayer(level, botChar);
+        int botY = botPos[0];
+        int botX = botPos[1];
+
+        int[] playerPos = FindPlayer(level, playerChar);
+        int playerY = playerPos[0];
+        int playerX = playerPos[1];
+
+        int distX = Math.Abs(botX-playerX);
+        int distY = Math.Abs(botY-playerY);
+
+        //find the distance between two points
+        double distance = Math.Sqrt((distX*distX) + (distY * distY));
+        double shortestDistance = distance;
+
+        int tempDistX;
+        int tempDistY;
+        double tempDistance;
+
+        bool validDirection;
+        int uslessNumber;
+        string directionToGo = "none";
+
+        //UP
+        (validDirection, uslessNumber) = CheckPlayerMovement(botY, botX, level, "up");
+        if(validDirection){
+
+            tempDistX = Math.Abs(botX-playerX);
+            tempDistY = Math.Abs((botY-1)-playerY);
+            tempDistance = Math.Sqrt((tempDistX*tempDistX) + (tempDistY * tempDistY));
+            
+            if(tempDistance <= shortestDistance){
+                directionToGo = "up";
+                shortestDistance = tempDistance;
+            }
+        }
+
+        //DOWN
+        (validDirection, uslessNumber) = CheckPlayerMovement(botY, botX, level, "down");
+        if(validDirection){
+
+            tempDistX = Math.Abs(botX-playerX);
+            tempDistY = Math.Abs((botY+1)-playerY);
+            tempDistance = Math.Sqrt((tempDistX*tempDistX) + (tempDistY * tempDistY));
+            
+            if(tempDistance <= shortestDistance){
+                directionToGo = "down";
+                shortestDistance = tempDistance;
+            }
+        }
+
+        //Left
+        (validDirection, uslessNumber) = CheckPlayerMovement(botY, botX, level, "left");
+        if(validDirection){
+
+            tempDistX = Math.Abs((botX-1)-playerX);
+            tempDistY = Math.Abs(botY-playerY);
+            tempDistance = Math.Sqrt((tempDistX*tempDistX) + (tempDistY * tempDistY));
+            
+            if(tempDistance <= shortestDistance){
+                directionToGo = "left";
+                shortestDistance = tempDistance;
+            }
+        }
+
+        //Right
+        (validDirection, uslessNumber) = CheckPlayerMovement(botY, botX, level, "right");
+        if(validDirection){
+
+            tempDistX = Math.Abs((botX+1)-playerX);
+            tempDistY = Math.Abs(botY-playerY);
+            tempDistance = Math.Sqrt((tempDistX*tempDistX) + (tempDistY * tempDistY));
+            
+            if(tempDistance <= shortestDistance){
+                directionToGo = "right";
+                shortestDistance = tempDistance;
+            }
+        }
+        
+        return directionToGo;
+
+        
+
+    }
+
+//#MoveCharacter
 //asks the player where to go and checks if its valid. If it is, move them there.
     static (int, bool) MoveCharacter(Dictionary<string,object> levels,char playerChar){
 
@@ -911,7 +1096,8 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
 
      //inputs y and x position of object, level, direction object is trying to go.
-    //outputs, is it valid?, level to swap to if you want to do that 
+    //outputs, is it valid?, level to swap to if you want to do that
+    //#CheckPlayerMovement 
     static Tuple<bool,int> CheckPlayerMovement(int y , int x, Dictionary<string, object> level, string direction)
         {
             char[][] levelLayout = (char[][])level["map"];
@@ -1092,3 +1278,4 @@ public struct CharacterStats
     // Add constructor and methods as needed
     //Make sure to change the MoveBots method to reflect changes AND the playerstats at the top of this file
 }
+
