@@ -42,7 +42,17 @@ public class Program
                         Health = 100,
                         Strength = 50,
                         Armor = 10,
-                        Weapons = new List<(string,string)> {("Punch","1d2")}
+                        Weapons = new List<(string,string)> {("Punch","1d2")},
+                        Items = new List<GameObject> {
+                                new GameObject
+                                        {
+                                            Name = "apple",
+                                            Actions = new List<Action>
+                                            {
+                                                new Action { Name = "eat", Health = 5, Response = "You eagerly consume your apple, the crispy sweetness makes you feel much better"},
+                                            }
+                                        }
+                            }
                     };
     public static void Main(){
         /*
@@ -64,8 +74,8 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\nYou wake up in a dark room, the only light source being a candle on the floor",
-                                    "'Maybe I should try to find someone...'",
+                                    "You awaken in a dimly lit chamber, with a lone /bcandle flickering on the /bfloor, casting feeble shadows on the walls.",
+                                    "You don't know how you got here, but you have a vague sence of someone watching you",
                                 }
                             },
                             { "map", new char[][]
@@ -96,6 +106,30 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' }
                                 }
                             },
+                            { "objects", new List<GameObject>
+                                {
+                                
+                                    new GameObject
+                                    {
+                                        Name = "candle",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "eat", Health = -20, Response = "The candle tastes like ash and... your mouth is burned"},
+                                            new Action { Name = "take", Response = "You stash the candle in your flame proof pocket", Add = "candle" },
+                                        }
+                                    },
+                                    new GameObject
+                                    {
+                                        Name = "floor",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "Action3", Health = 5 },
+                                            new Action { Name = "Action4", Health = 15 },
+                                        }
+                                    },
+                                    // Add more GameObjects as needed
+                                }
+                            },
                             { "directions", new List<Tuple<string, int>>
                                 {
                                     //tuple saying what level to switch to if you go north
@@ -118,9 +152,9 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\nThe trail splits.",
-                                    "You can hear something to the right ->, but the path to the left <- is dead silent",
-                                    "\nWhich way will you go?",
+                                    "The trail diverges ahead, presenting you with a choice.",
+                                    "To your right ->, you can faintly hear something, but the path to your left <- is shrouded in eerie silence.",
+                                    "Which path do you choose to take?"
                                 }
                             },
                             { "map", new char[][]
@@ -160,7 +194,7 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\nYou see a room patrolled by guards",
+                                    "\nYou see a /yroom patrolled by /rguards ",
                                     "\nYou probably shouldn't take them on with your bare fists",
                                 }
                             },
@@ -310,32 +344,11 @@ public class Program
 
                 } else if(output.ToLower() == "i" || output.ToLower() == "inventory"){
 
-                    //Show weapons
-                    Console.WriteLine("Weapons:");
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    foreach((string,string) weapon in playerStats.Weapons){
-                        Console.WriteLine($"{weapon.Item1} {weapon.Item2}");
-                    }
-                    Console.ForegroundColor = ConsoleColor.White;
-
-                    //Show armor class
-                    Console.WriteLine();
-                    Console.Write($"Armor class: ");
-                    Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write(playerStats.Armor);
-                    Console.ForegroundColor = ConsoleColor.White;
-
-                    //Show gold
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    Console.Write($"Gold: ");
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(gold);
-                    Console.ForegroundColor = ConsoleColor.White;
-
-                    Console.WriteLine();
-                    Console.ReadKey();
+                    DisplayPlayerStats();
+                } else{
+                    ActOnObject(level, output.ToLower());
                 }
+
             } else { //Fighting = true!
 
                 //repeat until not fighting
@@ -350,6 +363,113 @@ public class Program
 
         } while (true);
     }
+
+    static void DisplayPlayerStats(){
+        
+        //Show health
+        Console.Write("\nHealth: ");
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine(playerStats.Health);
+        Console.ForegroundColor = ConsoleColor.White;
+
+        //Show weapons
+        Console.WriteLine("\nWeapons:");
+        Console.ForegroundColor = ConsoleColor.Red;
+        foreach((string,string) weapon in playerStats.Weapons){
+            Console.WriteLine($"{weapon.Item1} {weapon.Item2}");
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+
+        //Show items
+        Console.WriteLine("\nItems:");
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        foreach (GameObject item in playerStats.Items)
+        {
+            if (!int.TryParse(item.Name, out _))
+            {
+                Console.WriteLine(item.Name);
+            }
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+
+        //Show armor class
+        Console.WriteLine();
+        Console.Write($"Armor class: ");
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.Write(playerStats.Armor);
+        Console.ForegroundColor = ConsoleColor.White;
+
+        //Show gold
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.Write($"Gold: ");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write(gold);
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.WriteLine();
+        Console.ReadKey();
+    }
+
+    static void ActOnObject(Dictionary<string, object> level, string input)
+    {
+        string[] itemInfo = input.Split(' ');
+        string inputItem = itemInfo[1];
+        string inputAction = itemInfo[0];
+        bool fromInventory = false;
+
+        // Retrieve the list of objects for the current level
+        List<GameObject> objects = (List<GameObject>)level["objects"];
+
+        // Search for the object with a matching name
+        GameObject targetObject = objects.Find(obj => obj.Name == inputItem);
+        if(targetObject == null){
+            targetObject = playerStats.Items.Find(obj => obj.Name == inputItem);
+            fromInventory = true;
+        }
+        if (targetObject != null)
+        {
+            // The object was found
+
+            // Iterate through the actions of the object
+            foreach (var action in targetObject.Actions)
+            {
+
+                // Perform actions based on the user's input
+                if (inputAction == "eat" && action.Name == "eat")
+                {
+                    Console.WriteLine(action.Response);
+
+                    if (action.Health > 0){
+
+                        Console.WriteLine($"you gain {action.Health} health");
+                    } else if(action.Health < 0) {
+
+                        Console.WriteLine($"you lose {Math.Abs(action.Health)} health");
+                    }
+                    
+                    //Scramble the name of the object so it can't be found
+                    targetObject.Name = rand.Next(1000,99999999).ToString();
+
+                    playerStats.Health+= action.Health;
+                    Console.ReadKey();
+                    break;
+                }
+
+                else if (inputAction == "take" && fromInventory == false && action.Name == "take")
+                {
+                        // Handle the "take" action
+                        Console.WriteLine(action.Response);
+
+                        playerStats.Items.Add(targetObject);
+
+                        Console.ReadKey();
+                }
+
+            }
+        }
+    }
+
 
     //What happens during the fighting stage
     static bool Fighting(Dictionary<string,object> level,Dictionary<string,object> levels, char playerChar){
@@ -1203,7 +1323,38 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
         // Print the text
         string text = GetLevelText(level);
-        Console.WriteLine(text);
+        string[] words = text.Split(" ");
+
+        foreach(string word in words){
+            Console.ForegroundColor = ConsoleColor.White;
+
+            //set the color to what color if specified
+            if(word.StartsWith('/')){
+            switch (word[1])
+            {
+                case 'b':
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                case 'r':
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case 'y':
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+            }
+            }
+
+            //remove any "/"
+            if(word.StartsWith('/')){
+                string word2 = word.TrimStart('/');
+                word2 = word2.Substring(1);
+                Console.Write(word2 + " ");
+            } else{
+                Console.Write(word + " ");
+            }
+
+        }
+        
 
         // Print the level layout
         Console.WriteLine("\n");
@@ -1273,9 +1424,23 @@ public struct CharacterStats
     public int Strength { get; set; }
     public int Armor { get; set; }
     public List<(string,string)> Weapons {get; set; }
+    public List<GameObject> Items {get; set;}
 
 
     // Add constructor and methods as needed
     //Make sure to change the MoveBots method to reflect changes AND the playerstats at the top of this file
 }
 
+public class Action
+{
+    public string Name { get; set; }
+    public int Health { get; set; }
+    public string Response { get; set; }
+    public string Add { get; set; }
+}
+
+public class GameObject
+{
+    public string Name { get; set; }
+    public List<Action> Actions { get; set; }
+}
