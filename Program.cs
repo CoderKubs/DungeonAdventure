@@ -14,8 +14,18 @@ using System.Xml;
 
 public class Program
 {   
-    public static (string,string)[] basicChestLoot = new (string,string)[2] {("Sword", "1d6"),("Knife", "2d4")};
+    public static (string, string)[] basicChestLoot = new (string, string)[] {
+    ("Sword", "1d8"),
+    ("Knife", "2d3"),
+    ("Axe", "1d10"),
+    ("Mace", "2d4"),
+    ("Longbow", "1d10"),
+    ("Dagger", "1d6"),
+    ("Warhammer", "2d6"),
+    };
+
     public static string enemyAttackInfo = "";
+    public static int gold = 0;
     public static Random rand = new Random();
     public static List<CharacterStats> fightingBots = new List<CharacterStats>();
     public static int currentLevel;
@@ -41,7 +51,7 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\n'Where am I?' You ask, but no one can hear you",
+                                    "\nYou wake up in a dark room, the only light source being a candle on the floor",
                                     "'Maybe I should try to find someone...'",
                                 }
                             },
@@ -82,8 +92,8 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\n'Where am I?' You ask, but no one can hear you",
-                                    "\n'Maybe I should try to find someone...'",
+                                    "\nYou come to a crossroads",
+                                    "\nWhich way will you go?",
                                 }
                             },
                             { "map", new char[][]
@@ -111,7 +121,7 @@ public class Program
                                 }
                             },
 
-                            { "bots", new List<Tuple<char, string, char, bool, (int, int)>>()
+                            { "bots", new List<CharacterStats>()
                                 {
 
                                 }
@@ -123,23 +133,22 @@ public class Program
                         {
                             { "text", new List<string>
                                 {
-                                    "\n'Where am I?' You ask, but no one can hear you",
-                                    "\n'Maybe I should try to find someone...'",
+                                    "\nYou see a room with guards patroling the area",
+                                    "\nYou probably shouldn't take them on with your bare fists",
                                 }
                             },
                             { "map", new char[][]
                                 {
                                     new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', '.', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', ' ', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', '.', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ',', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', 'x', ' ', 'x', ' ', 'x', 'x'},
+                                    new char[] { ' ', ' ', ' ', ' ', ' ', ' ', 'x', '.', 'x', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', '1', ' ', ' ', ' ', ' ', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x'},
                                     }
 
                             },
@@ -151,9 +160,11 @@ public class Program
                                     Tuple.Create("west", 1)
                                 }
                             },
-                            { "bots", new List<Tuple<char, string, char, bool, (int, int)>>()
-                                {
 
+                            { "bots", new List<CharacterStats>()
+                                {
+                                    new CharacterStats { Char = '1', Direction = "up", StandingOn = ' ', IsChasing = false, Health = 4, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
+                                    new CharacterStats { Char = '2', Direction = "down", StandingOn = ' ', IsChasing = false,  Health = 2, Strength = 10, Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d8")}},
                                 }
                             }
                             
@@ -230,16 +241,18 @@ public class Program
                         if (newLevel != currentLevel){
                             currentLevel = newLevel;
                         }
+                        level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
 
-
-                        MoveBots(level,playerChar);
-                        fighting = CheckIfBotNearby(level, playerChar,fighting);
+                        if(level.ContainsKey("bots")){
+                            MoveBots(level,playerChar);
+                            fighting = CheckIfBotNearby(level, playerChar,fighting);
+                        }
 
                         if(fighting){
                             break;
                         }
 
-                        if(lastTile == '.'){
+                        if(lastTile == '.' || lastTile == ','){
                             lastTile = ' ';
                             PickUpLoot('.');
                         }
@@ -252,6 +265,33 @@ public class Program
                     Console.WriteLine("'m' to move around using the arrow keys");
                     Console.WriteLine("press any button to continue");
                     Console.ReadKey(true);
+                } else if(output.ToLower() == "i" || output.ToLower() == "inventory"){
+
+                    //Show weapons
+                    Console.WriteLine("Weapons:");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    foreach((string,string) weapon in playerStats.Weapons){
+                        Console.WriteLine($"{weapon.Item1} {weapon.Item2}");
+                    }
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    //Show armor class
+                    Console.WriteLine();
+                    Console.Write($"Armor class: ");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write(playerStats.Armor);
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    //Show gold
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.Write($"Gold: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(gold);
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    Console.WriteLine();
+                    Console.ReadKey();
                 }
             } else { //Fighting = true!
 
@@ -952,7 +992,20 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
     static void PickUpLoot(char lootType){
         if(lootType == '.'){ // basic chest
-            (string, string) weapon = basicChestLoot[rand.Next(0,basicChestLoot.Length)];
+            int randomNumber = rand.Next(1,3);
+            if(randomNumber == 1){//Weapon
+
+                (string, string) weapon = basicChestLoot[rand.Next(0,basicChestLoot.Length)];
+                playerStats.Weapons.Add(weapon);
+                Console.WriteLine($"You found a {weapon.Item1} {weapon.Item2}");
+
+            } else if(randomNumber == 2){//Gold
+                int randomGold = rand.Next(10,20);
+                gold += randomGold;
+                Console.WriteLine($"You found {randomGold} gold");
+            }
+
+            Console.ReadKey();
         }
     }
 
@@ -977,11 +1030,16 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                     Console.Write("  ");
 
                 } else
-                if(tile == '.'){
+                if(tile == '.' || tile == ','){
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write("o ");
+                    if(tile == '.'){
+                        Console.Write("o ");
+                    } else {
+                        Console.Write(" o");
+                    }
+                    
                     Console.ForegroundColor = ConsoleColor.White;
 
 
