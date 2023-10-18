@@ -123,8 +123,8 @@ public class Program
                                         Name = "floor",
                                         Actions = new List<Action>
                                         {
-                                            new Action { Name = "Action3", Health = 5 },
-                                            new Action { Name = "Action4", Health = 15 },
+                                            new Action { Name = "eat", Health = 0, Response = "You put your face on the floor and lick. It tastes like Skittles." },
+                                            new Action { Name = "take", Response = "You can't take the floor, silly!", Add = "none"},
                                         }
                                     },
                                     // Add more GameObjects as needed
@@ -414,58 +414,61 @@ public class Program
     static void ActOnObject(Dictionary<string, object> level, string input)
     {
         string[] itemInfo = input.Split(' ');
-        string inputItem = itemInfo[1];
-        string inputAction = itemInfo[0];
-        bool fromInventory = false;
+        if (itemInfo.Length == 2){
+            string inputItem = itemInfo[1];
+            string inputAction = itemInfo[0];
+            bool fromInventory = false;
 
-        // Retrieve the list of objects for the current level
-        List<GameObject> objects = (List<GameObject>)level["objects"];
+            // Retrieve the list of objects for the current level
+            List<GameObject> objects = (List<GameObject>)level["objects"];
 
-        // Search for the object with a matching name
-        GameObject targetObject = objects.Find(obj => obj.Name == inputItem);
-        if(targetObject == null){
-            targetObject = playerStats.Items.Find(obj => obj.Name == inputItem);
-            fromInventory = true;
-        }
-        if (targetObject != null)
-        {
-            // The object was found
-
-            // Iterate through the actions of the object
-            foreach (var action in targetObject.Actions)
+            // Search for the object with a matching name
+            GameObject targetObject = objects.Find(obj => obj.Name == inputItem);
+            if(targetObject == null){
+                targetObject = playerStats.Items.Find(obj => obj.Name == inputItem);
+                fromInventory = true;
+            }
+            if (targetObject != null)
             {
+                // The object was found
 
-                // Perform actions based on the user's input
-                if (inputAction == "eat" && action.Name == "eat")
+                // Iterate through the actions of the object
+                foreach (var action in targetObject.Actions)
                 {
-                    Console.WriteLine(action.Response);
 
-                    if (action.Health > 0){
-
-                        Console.WriteLine($"you gain {action.Health} health");
-                    } else if(action.Health < 0) {
-
-                        Console.WriteLine($"you lose {Math.Abs(action.Health)} health");
-                    }
-                    
-                    //Scramble the name of the object so it can't be found
-                    targetObject.Name = rand.Next(1000,99999999).ToString();
-
-                    playerStats.Health+= action.Health;
-                    Console.ReadKey();
-                    break;
-                }
-
-                else if (inputAction == "take" && fromInventory == false && action.Name == "take")
-                {
-                        // Handle the "take" action
+                    // Perform actions based on the user's input
+                    if (inputAction == "eat" && action.Name == "eat")
+                    {
                         Console.WriteLine(action.Response);
 
-                        playerStats.Items.Add(targetObject);
+                        if (action.Health > 0){
 
+                            Console.WriteLine($"you gain {action.Health} health");
+                        } else if(action.Health < 0) {
+
+                            Console.WriteLine($"you lose {Math.Abs(action.Health)} health");
+                        }
+                        
+                        //Scramble the name of the object so it can't be found
+                        targetObject.Name = rand.Next(1000,99999999).ToString();
+
+                        playerStats.Health+= action.Health;
                         Console.ReadKey();
-                }
+                        break;
+                    }
 
+                    else if (inputAction == "take" && fromInventory == false && action.Name == "take")
+                    {
+                            // Handle the "take" action
+                            Console.WriteLine(action.Response);
+                            if(!(action.Add == "none")){
+                                playerStats.Items.Add(targetObject);
+                            }
+                            
+                            Console.ReadKey();
+                    }
+
+                }
             }
         }
     }
