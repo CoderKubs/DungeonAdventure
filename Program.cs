@@ -16,15 +16,40 @@ using System.Xml;
 
 public class Program
 {   
-    public static (string, string)[] basicChestLoot = new (string, string)[] {
+    public static (string, string)[] basicChestLootWeapons = new (string, string)[] {
     ("Sword", "1d8"),
     ("Knife", "2d3"),
     ("Axe", "1d10"),
     ("Mace", "2d4"),
-    ("Longbow", "1d10"),
     ("Dagger", "1d6"),
     ("Warhammer", "2d6"),
     };
+
+    public static GameObject[] basicChestLootItems = new GameObject[] {
+
+    new GameObject
+    {
+        Name = "health potion",
+        Actions = new List<Action>
+        {
+            new Action { Name = "eat", Health = 10, Response = "After poping the lid off the vial, you guzzle down the red liquid."},
+            new Action { Name = "take", Response = "you gain a health potion", Add = "health potion" },
+        }
+    },
+
+    new GameObject
+    {
+        Name = "speed potion",
+        Actions = new List<Action>
+        {
+            new Action { Name = "eat", Health = 0, Response = "After poping the lid off the vial, you guzzle down the white liquid."},
+            new Action { Name = "take", Response = "you gain a speed potion", Add = "speed potion" },
+        }
+    },
+
+
+    };
+
 
     public static string enemyAttackInfo = "";
     public static int gold = 0;
@@ -44,13 +69,25 @@ public class Program
                         Weapons = new List<(string,string)> {("Punch","1d2")},
                         Items = new List<GameObject> {
                                 new GameObject
+                                    {
+                                        Name = "apple",
+                                        Actions = new List<Action>
                                         {
-                                            Name = "apple",
-                                            Actions = new List<Action>
-                                            {
-                                                new Action { Name = "eat", Health = 5, Response = "You eagerly consume your apple, the crispy sweetness makes you feel much better"},
-                                            }
+                                            new Action { Name = "eat", Health = 5, Response = "You eagerly consume your apple, the crispy sweetness makes you feel much better"},
                                         }
+                                    },
+
+                                
+                                new GameObject
+                                {
+                                    Name = "speed potion",
+                                    Actions = new List<Action>
+                                    {
+                                        new Action { Name = "eat", Health = 0, Response = "After poping the lid off the vial, you guzzle down the white liquid."},
+                                        new Action { Name = "take", Response = "you gain a speed potion", Add = "speed potion" },
+                                    }
+                                },
+                                
                             }
                     };
     public static void Main(){
@@ -100,7 +137,7 @@ public class Program
                                         Name = "candle",
                                         Actions = new List<Action>
                                         {
-                                            new Action { Name = "eat", Health = -20, Response = "The candle tastes like ash and... your mouth is burned"},
+                                            new Action { Name = "eat", Health = -1, Response = "The candle tastes like ash and... your mouth is burned"},
                                             new Action { Name = "take", Response = "You stash the candle in your fire-proof pocket", Add = "candle" },
                                         }
                                     },
@@ -185,7 +222,8 @@ public class Program
                             { "text", new List<string>
                                 {
                                     "\nYou see a /yroom patrolled by /rguards ",
-                                    "\nYou probably shouldn't take them on with your bare fists",
+                                    "You probably shouldn't take them on with your bare fists",
+                                    "\nDon't be seen!",
                                 }
                             },
                             { "objects", new List<GameObject>
@@ -208,11 +246,11 @@ public class Program
                                     new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', '1', ' ', ' ', ' ', '2', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', ' ', 'x', ' ', 'x', ' ', 'x', ' ', 'x'},
-                                    new char[] { ' ', ' ', ' ', ' ', ' ', 'x', '.', 'x', ' ', ' ', ' ', 'x'},
+                                    new char[] { ' ', ' ', ' ', ' ', ' ', 'x', ':', 'x', ' ', ' ', ' ', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', ' ', 'x', 'x', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', '1', ' ', ' ', ' ', '2', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
                                     }
@@ -230,7 +268,7 @@ public class Program
                             { "bots", new List<CharacterStats>()
                                 {
                                     new CharacterStats { Char = '1', Direction = "up", StandingOn = ' ', IsChasing = false, Health = 2,  Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d3")}},
-                                    new CharacterStats { Char = '2', Direction = "down", StandingOn = ' ', IsChasing = false,  Health = 2,  Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d3")}},
+                                    new CharacterStats { Char = '2', Direction = "left", StandingOn = ' ', IsChasing = false,  Health = 2,  Armor = 5, Weapons = new List<(string,string)> {("Cutlass","1d3")}},
                                 }
                             }
                             
@@ -289,7 +327,7 @@ public class Program
                             { "directions", new List<Tuple<string, int>>
                                 {
                                     Tuple.Create("north", 2),
-                                    Tuple.Create("south", 2),
+                                    Tuple.Create("south", 5),
                                     Tuple.Create("east", 3),
                                     Tuple.Create("west", 1)
                                 }
@@ -302,6 +340,62 @@ public class Program
                             
                         }
 
+                    },
+
+                    {  "level5", new Dictionary<string, object>
+                        {
+                            { "text", new List<string>
+                                {
+                                    "\nYou find a large chamber lit with a /btorch and guarded by a /rmassive /rtroll  ",
+                                    "Within the chamber, you notice the somber remnants of past adventurers. Amidst their final resting places, gleaming piles of /ygold and an assortment of /yvaluable /yitems catch your eye.",
+                                    "The troll appears extremely agile, but with a calculated approach, there might be a chance to grab a handful of treasure without drawing its attention."
+                                }
+                            },
+                            { "objects", new List<GameObject>
+                                {
+                                
+                                    new GameObject
+                                    {
+                                        Name = "torch",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "take", Response = "You reach out and grab the torch from the wall.", Add = "torch" },
+                                        }
+                                    }
+
+                                }
+                            },
+                            { "map", new char[][]
+                                {
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '.', 'x'},
+                                    new char[] { 'x', ' ', ' ', ' ', ' ', '.', ' ', ' ', ' ', ' ', ' ', 'x'},
+                                    new char[] { 'x', ' ', ' ', 'x', ' ', ' ', ' ', ',', 'x', ' ', ' ', 'x'},
+                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x'},
+                                    new char[] { 'x', '.', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
+                                    new char[] { 'x', '.', '1', ' ', ' ', ',', ' ', ' ', ',', ' ', ' ', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    }
+
+                            },
+                            { "directions", new List<Tuple<string, int>>
+                                {
+                                    Tuple.Create("north", 4),
+                                    Tuple.Create("south", 2),
+                                    Tuple.Create("east", 3),
+                                    Tuple.Create("west", 1)
+                                }
+                            },
+
+                            { "bots", new List<CharacterStats>()
+                                {
+                                    new CharacterStats { Char = '1', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 20,  Armor = 10, Weapons = new List<(string,string)> {("Club","2d8"),("Punch","1d10")}},
+                                }
+                            }
+                            
+                        }
                     }
                 };
 
@@ -316,7 +410,7 @@ public class Program
         char playerChar = 'o';
         bool moving = false;
         bool fighting = false;
-        char botChar = '.';
+
 
         Console.BackgroundColor = ConsoleColor.Black;
         Console.Clear();
@@ -338,10 +432,9 @@ public class Program
                 moving = false;
                 Console.WriteLine("What do you want to do?");
                 Console.WriteLine(); // New line
-                Console.ForegroundColor = ConsoleColor.Blue; // Set text color to blue
-                Console.Write("h");
-                Console.ForegroundColor = ConsoleColor.White; // Reset text color to white
-                Console.Write(" for help\n");
+                WriteLineWithColors("/bh for help");
+                Console.WriteLine(); // New line
+
                 string output = GetWhatToDo();
 
                 if(output.ToLower() == "move"|| output.ToLower() == "m"){
@@ -380,8 +473,15 @@ public class Program
                         }
                         level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
 
-                        if(level.ContainsKey("bots")){
+                        if(level.ContainsKey("bots") && moving == true){
                             MoveBots(level,playerChar);
+                            if(currentLevel == 5 && rand.Next(1,3) == 1){
+
+                                Console.Clear();
+                                // DisplayLevel(level, playerChar);
+                                // Thread.Sleep(500);
+                                MoveBots(level,playerChar);
+                            }
                             fighting = CheckIfBotNearby(level, playerChar,fighting);
                         }
 
@@ -389,10 +489,11 @@ public class Program
                             break;
                         }
 
-                        if(lastTile == '.' || lastTile == ','){
+                        if(lastTile == '.' || lastTile == ',' || lastTile == ':'){
+                            PickUpLoot(lastTile);
                             lastTile = ' ';
-                            PickUpLoot('.');
                         }
+
                     }while(moving);
                 
                 } else if(output.ToLower() == "h" || output.ToLower() == "help"){
@@ -415,7 +516,7 @@ public class Program
                     Console.ReadKey();
 
                 } else{
-                    ActOnObject(level, output.ToLower());
+                    ActOnObject(levels, level, output.ToLower(), playerChar);
                 }
 
             } else { //Fighting = true!
@@ -440,26 +541,17 @@ public class Program
         Console.WriteLine("Here are all the possible actions:\n");
 
 
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.Write("i");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.Write(" for inventory\n");
+        WriteLineWithColors("/bi for inventory");
+        Console.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.Write("m");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.Write(" to move around using the arrow keys\n");
+        WriteLineWithColors("/bm to move around using the arrow keys");
+        Console.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.Write("eat <item>");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.Write("\n");
+        WriteLineWithColors("/beat /b<item>");
+        Console.WriteLine();
 
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.Write("take <item>");
-        Console.ForegroundColor = ConsoleColor.White;
-
-
+        WriteLineWithColors("/btake /b<item>");
+        Console.WriteLine();
 
         Console.WriteLine("\n\npress any button to continue");
         Console.ReadKey(true);
@@ -467,10 +559,8 @@ public class Program
     static void DisplayPlayerStats(){
         
         //Show health
-        Console.Write("\nHealth: ");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine(playerStats.Health);
-        Console.ForegroundColor = ConsoleColor.White;
+        WriteLineWithColors($"Health: /g{playerStats.Health}");
+        Console.WriteLine();
 
         //Show weapons
         Console.WriteLine("\nWeapons:");
@@ -494,29 +584,34 @@ public class Program
 
         //Show armor class
         Console.WriteLine();
-        Console.Write($"Armor class: ");
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.Write(playerStats.Armor);
-        Console.ForegroundColor = ConsoleColor.White;
+        WriteLineWithColors($"Armor Class: /b{playerStats.Armor}");
 
         //Show gold
         Console.WriteLine();
         Console.WriteLine();
-        Console.Write($"Gold: ");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write(gold);
-        Console.ForegroundColor = ConsoleColor.White;
+        WriteLineWithColors($"Gold: /y{gold}");
 
         Console.WriteLine();
         Console.ReadKey();
     }
 
-    static void ActOnObject(Dictionary<string, object> level, string input)
+    static void ActOnObject(Dictionary<string,object> levels, Dictionary<string, object> level, string input, char playerChar)
     {
         string[] itemInfo = input.Split(' ');
-        if (itemInfo.Length == 2){
-            string inputItem = itemInfo[1];
-            string inputAction = itemInfo[0];
+        if (itemInfo.Length == 2 || itemInfo.Length == 3){
+            string inputItem;
+            string inputAction;
+            if(itemInfo.Length == 3){
+
+                inputItem = itemInfo[1]+ " " + itemInfo[2];
+                inputAction = itemInfo[0];
+
+            } else {
+                inputItem = itemInfo[1];
+                inputAction = itemInfo[0];
+            }
+            
+            
             bool fromInventory = false;
 
             // Retrieve the list of objects for the current level
@@ -553,7 +648,22 @@ public class Program
                         targetObject.Name = rand.Next(1000,99999999).ToString();
 
                         playerStats.Health+= action.Health;
-                        Console.ReadKey();
+
+                        if(inputItem == "speed potion"){
+                            Console.Clear();
+                            WriteLineWithColors("You get /y4 moves. Use them wisely.");
+                            WriteLineWithColors("\nPress any key to continue");
+                            Console.ReadKey(true);
+
+                            for(int i = 1; i <5; i++){
+                                DisplayLevel(level,playerChar);
+                                MoveCharacter(levels, playerChar);
+                            }
+                        } else{
+                            Console.ReadKey();
+                        }
+
+                        
                         break;
                     }
 
@@ -763,96 +873,11 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
     //#PlayerTurn
     static bool PlayerTurn(Dictionary<string, object> level, Dictionary<string,object> levels, char playerChar)
     {
-        do{
-            Console.Clear();
-            DisplayFightingLevel(level, playerChar);
+        bool fighting = true;
+        fighting = CheckIfBotNearby(level,playerChar, true);
 
-            bool fighting = true;
-            Console.WriteLine("\nWhat do you do?");
-            Console.WriteLine("\"h\" for help");
-            string input = GetWhatToDo();
-            bool playerTurnOver = true;
-
-            if (input.ToLower() == "attack" || input.ToLower() == "2")
-            {
-
-                //print choose a weapon
-                Console.WriteLine("\nChoose a weapon:");
-                List<string> choices = new List<string>();
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                //Show each weapon and add it to the list of choices
-                foreach((string,string) weapon in playerStats.Weapons){
-                    Console.WriteLine("-"+weapon.Item1 + " " + weapon.Item2);
-                    string name = weapon.Item1;
-                    choices.Add(name.ToLower());
-                }
-                Console.ForegroundColor = ConsoleColor.White;
-
-                //Get a valid input
-                while(true){
-                    input = GetWhatToDo();
-                    input = input.ToLower();
-                    if(choices.Contains(input)){
-                        break;
-                    } else {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Input Invalid. Try again.");
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                }
-
-                //find the damage
-                string diceToRoll = playerStats.Weapons.Find(w => w.Item1.ToLower() == input).Item2;
-                int damageToDeal = RollDice(diceToRoll);
-
-                if (fightingBots.Count == 1)
-                {
-                    //Check if it hits by rolling 1d20 and comparing to the armor class
-                    int roll = RollDice("1d20");
-                    if(roll > fightingBots[0].Armor){
-                        enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
-                        fighting = DamageBot(level, fightingBots[0].Char, damageToDeal);
-                    } else{
-                        enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
-                        fighting = DamageBot(level, fightingBots[0].Char, damageToDeal/2);
-                    }
-
-                    
-                }
-                else
-                {
-                    Console.WriteLine("Which enemy do you want to attack?");
-                    char whichBotToFight;
-
-                    do
-                    {
-                        input = GetWhatToDo();
-
-                        if (char.TryParse(input, out whichBotToFight) && whichBotToFight >= '1' && whichBotToFight <= (char)('0' + fightingBots.Count))
-                        {
-                            
-                            int roll = RollDice("1d20");
-                            if(roll > fightingBots[0].Armor){
-                                enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
-                                fighting = DamageBot(level, whichBotToFight, damageToDeal);
-                            } else{
-                                enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
-                                fighting = DamageBot(level, whichBotToFight, damageToDeal/2);
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid input. Please enter a valid integer between '1' and " + (char)('0' + fightingBots.Count) + ".");
-                        }
-                    } while (true);
-                }
-            }
-            else if (input.ToLower() == "run" || input.ToLower() == "1")
-            {
-
-                List<CharacterStats> botsList = (List<CharacterStats>)level["bots"];
+        if(!fighting){
+            List<CharacterStats> botsList = (List<CharacterStats>)level["bots"];
                 List<CharacterStats> updatedBotsList = new List<CharacterStats>(botsList.Count);
                 
 
@@ -878,39 +903,157 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
 
                 level["bots"] = updatedBotsList; // Update the list in the dictionary
                 fighting = false;
-                MoveCharacter(levels, playerChar);
-                
-            } else if(input.ToLower() == "h" || input.ToLower() == "help"){
-
-                Console.Clear();
-                Console.WriteLine(@"Here is a list of actions:
-1. Run
-2. Attack
-3. eat <item>
-4. Inventory");
-                Console.ReadKey();
-                playerTurnOver = false;
-            } else if(input.ToLower() == "i" || input.ToLower() == "inventory" || input.ToLower() == "4"){
-
-                Console.Clear();
-                DisplayPlayerStats();
-                playerTurnOver = false;
-            }else if(input.ToLower() == "eat" || input.ToLower() == "3"){
-
-                Console.WriteLine("To eat, type \"eat\" space and the item you want to eat");
-                Console.WriteLine("For example: eat apple");
-                Console.ReadKey();
-            } else {
-
-                ActOnObject(level, input.ToLower());
-                playerTurnOver = false;
-            }
-
-            //If the turn is over, exit this method
-            if(playerTurnOver){
                 return fighting;
-            }
-        }while(true);
+                
+        } else{
+            do{
+                Console.Clear();
+                DisplayFightingLevel(level, playerChar);
+
+                Console.WriteLine("\nWhat do you do?");
+                Console.WriteLine("\"h\" for help");
+                string input = GetWhatToDo();
+                bool playerTurnOver = true;
+
+                if (input.ToLower() == "attack" || input.ToLower() == "2")
+                {
+
+                    //print choose a weapon
+                    Console.WriteLine("\nChoose a weapon:");
+                    List<string> choices = new List<string>();
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    //Show each weapon and add it to the list of choices
+                    foreach((string,string) weapon in playerStats.Weapons){
+                        Console.WriteLine("-"+weapon.Item1 + " " + weapon.Item2);
+                        string name = weapon.Item1;
+                        choices.Add(name.ToLower());
+                    }
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    //Get a valid input
+                    while(true){
+                        input = GetWhatToDo();
+                        input = input.ToLower();
+                        if(choices.Contains(input)){
+                            break;
+                        } else {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Input Invalid. Try again.");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
+                    }
+
+                    //find the damage
+                    string diceToRoll = playerStats.Weapons.Find(w => w.Item1.ToLower() == input).Item2;
+                    int damageToDeal = RollDice(diceToRoll);
+
+                    if (fightingBots.Count == 1)
+                    {
+                        //Check if it hits by rolling 1d20 and comparing to the armor class
+                        int roll = RollDice("1d20");
+                        if(roll > fightingBots[0].Armor){
+                            enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
+                            fighting = DamageBot(level, fightingBots[0].Char, damageToDeal);
+                        } else{
+                            enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
+                            fighting = DamageBot(level, fightingBots[0].Char, damageToDeal/2);
+                        }
+
+                        
+                    }
+                    else
+                    {
+                        Console.WriteLine("Which enemy do you want to attack?");
+                        char whichBotToFight;
+
+                        do
+                        {
+                            input = GetWhatToDo();
+
+                            if (char.TryParse(input, out whichBotToFight) && whichBotToFight >= '1' && whichBotToFight <= (char)('0' + fightingBots.Count))
+                            {
+                                
+                                int roll = RollDice("1d20");
+                                if(roll > fightingBots[0].Armor){
+                                    enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
+                                    fighting = DamageBot(level, whichBotToFight, damageToDeal);
+                                } else{
+                                    enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
+                                    fighting = DamageBot(level, whichBotToFight, damageToDeal/2);
+                                }
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid input. Please enter a valid integer between '1' and " + (char)('0' + fightingBots.Count) + ".");
+                            }
+                        } while (true);
+                    }
+                }
+                else if (input.ToLower() == "run" || input.ToLower() == "1")
+                {
+
+                    List<CharacterStats> botsList = (List<CharacterStats>)level["bots"];
+                    List<CharacterStats> updatedBotsList = new List<CharacterStats>(botsList.Count);
+                    
+
+                    foreach (CharacterStats bot in botsList)
+                    {
+                        bool updated = false;
+                        foreach (CharacterStats enemy in fightingBots)
+                        {
+
+                            if (bot.Char == enemy.Char)
+                            {
+                                updatedBotsList.Add(enemy);
+                                updated = true;
+                                break;
+                            }
+                        }
+
+                        if (!updated)
+                        {
+                            updatedBotsList.Add(bot);
+                        }
+                    }
+
+                    level["bots"] = updatedBotsList; // Update the list in the dictionary
+                    fighting = false;
+                    MoveCharacter(levels, playerChar);
+                    
+                } else if(input.ToLower() == "h" || input.ToLower() == "help"){
+
+                    Console.Clear();
+                    Console.WriteLine(@"Here is a list of actions:
+    1. Run
+    2. Attack
+    3. eat <item>
+    4. Inventory");
+                    Console.ReadKey();
+                    playerTurnOver = false;
+                } else if(input.ToLower() == "i" || input.ToLower() == "inventory" || input.ToLower() == "4"){
+
+                    Console.Clear();
+                    DisplayPlayerStats();
+                    playerTurnOver = false;
+                }else if(input.ToLower() == "eat" || input.ToLower() == "3"){
+
+                    Console.WriteLine("To eat, type \"eat\" space and the item you want to eat");
+                    Console.WriteLine("For example: eat apple");
+                    Console.ReadKey();
+                } else {
+
+                    ActOnObject(levels, level, input.ToLower(), playerChar);
+                    playerTurnOver = false;
+                }
+
+                //If the turn is over, exit this method
+                if(playerTurnOver){
+                    return fighting;
+                }
+            }while(true);
+        }
     }
 
     static int RollDice(string diceToRoll){
@@ -957,9 +1100,11 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                         addBot = false;
                     }
                 }
+
                 if(addBot){
                     fightingBots.Add(bot);
                 }
+
                 fighting = true;
             }
         }
@@ -1008,21 +1153,43 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                         standingOnWhat = MoveCharToPlace(level, botChar, direction, standingOnWhat);
                     } else {
 
-                        // Rotate the direction 90 degrees clockwise using a switch
-                        switch (direction)
+                        if (currentLevel == 3)
                         {
-                            case "up":
-                                direction = "right";
-                                break;
-                            case "right":
-                                direction = "down";
-                                break;
-                            case "down":
-                                direction = "left";
-                                break;
-                            case "left":
-                                direction = "up";
-                                break;
+                            // Rotate the direction 90 degrees clockwise using a switch
+                            switch (direction)
+                            {
+                                case "up":
+                                    direction = "right";
+                                    break;
+                                case "right":
+                                    direction = "down";
+                                    break;
+                                case "down":
+                                    direction = "left";
+                                    break;
+                                case "left":
+                                    direction = "up";
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            // Generate a random direction that is not the current one
+                            string[] possibleDirections = { "up", "right", "down", "left" };
+                            List<string> availableDirections = possibleDirections.Except(new List<string> { direction }).ToList();
+                            
+                            // Select a random direction from the available ones
+                            int randomIndex = rand.Next(availableDirections.Count);
+                            direction = availableDirections[randomIndex];
+
+                            // Wandering ai
+                            botPosition = FindPlayer(level, botChar);
+                            checkMovement = CheckPlayerMovement(botPosition[0], botPosition[1], level, direction);
+                            successful = checkMovement.Item1;
+
+                            if(successful){
+                                standingOnWhat = MoveCharToPlace(level, botChar, direction, standingOnWhat);
+                            }
                         }
                     }
                 
@@ -1200,7 +1367,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
         
             DisplayLevel(level,playerChar);
             Console.WriteLine("Where do you want to go?");
-            Console.WriteLine("Use the arrow keys or press escape to stop");
+            Console.WriteLine("Use the arrow keys to move, and press escape to stop");
 
             //Moves the character depending on the output
             //Store the keyInfo from player output
@@ -1437,33 +1604,60 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
     }
 
     static void PickUpLoot(char lootType){
-        if(lootType == '.'){ // basic chest
-            int randomNumber = rand.Next(1,3);
-            if(randomNumber == 1){//Weapon
+        if(lootType == '.' || lootType == ','){ // basic chest
+            int randomNumber = rand.Next(1,4);
+            if(randomNumber == 1){                //Weapon
 
-                (string, string) weapon = basicChestLoot[rand.Next(0,basicChestLoot.Length)];
+                (string, string) weapon = basicChestLootWeapons[rand.Next(0,basicChestLootWeapons.Length)];
                 playerStats.Weapons.Add(weapon);
-                Console.WriteLine($"You found a {weapon.Item1} {weapon.Item2}");
+                WriteLineWithColors($"You found a /r{weapon.Item1} /r{weapon.Item2}");
 
-            } else if(randomNumber == 2){//Gold
+            } else if(randomNumber == 2){        //Gold
+
                 int randomGold = rand.Next(10,20);
                 gold += randomGold;
-                Console.WriteLine($"You found {randomGold} gold");
+                WriteLineWithColors($"You found /y{randomGold} gold");
+
+            } else if(randomNumber ==3){             //Items
+                GameObject item = basicChestLootItems[rand.Next(0,basicChestLootItems.Length)];
+                playerStats.Items.Add(item);
+                WriteLineWithColors($"You found a /p{item.Name}");
+            }
+
+            Console.ReadKey();
+
+
+        }else if(lootType == ':'){
+            for(int i = 0; i<2; i++){
+                int randomNumber = rand.Next(1,4);
+                if(randomNumber == 1){                //Weapon
+
+                    (string, string) weapon = basicChestLootWeapons[rand.Next(0,basicChestLootWeapons.Length)];
+                    playerStats.Weapons.Add(weapon);
+                    WriteLineWithColors($"You found a /r{weapon.Item1} /r{weapon.Item2}");
+
+                } else if(randomNumber == 2){        //Gold
+
+                    int randomGold = rand.Next(10,20);
+                    gold += randomGold;
+                    WriteLineWithColors($"You found /y{randomGold} gold");
+
+                } else if(randomNumber ==3){             //Items
+                    GameObject item = basicChestLootItems[rand.Next(0,basicChestLootItems.Length)];
+                    playerStats.Items.Add(item);
+                    WriteLineWithColors($"You found a /p{item.Name}");
+                }
+                Console.WriteLine();
             }
 
             Console.ReadKey();
         }
-    }
+    } 
 
-
-    static void DisplayLevel(Dictionary<string, object> level,char playerChar){
-
-        Console.Clear();
-        char[][] map = (char[][])level["map"];
-
-        // Print the text
-        string text = GetLevelText(level);
-        string[] words = text.Split(" ");
+    //#WriteLineWithColors
+    //An alternative to Console.WriteLine() which can change the color of the words using a /b before the word. For example: this /bword is blue!
+    static void WriteLineWithColors(string text){
+                string[] words = text.Split(" ");
 
         foreach(string word in words){
             Console.ForegroundColor = ConsoleColor.White;
@@ -1481,6 +1675,12 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                 case 'y':
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     break;
+                case 'p':
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    break;
+                case 'g':
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
             }
             }
 
@@ -1493,7 +1693,19 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                 Console.Write(word + " ");
             }
 
+            Console.ForegroundColor = ConsoleColor.White;
+
         }
+    }
+
+    static void DisplayLevel(Dictionary<string, object> level,char playerChar){
+
+        Console.Clear();
+        char[][] map = (char[][])level["map"];
+
+        // Print the text
+        string text = GetLevelText(level);
+        WriteLineWithColors(text);
         
 
         // Print the level layout
@@ -1507,7 +1719,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                     Console.Write("  ");
 
                 } else
-                if(tile == '.' || tile == ','){
+                if(tile == '.' || tile == ',' || tile == ':'){
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.BackgroundColor = ConsoleColor.Black;
@@ -1526,7 +1738,10 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                         Console.BackgroundColor = ConsoleColor.Black;
                     } else if (lastTile == 'w'){
                         Console.BackgroundColor = ConsoleColor.Cyan;
+                    } else if (lastTile == '.'||lastTile == ',' || lastTile == ':'){
+                        Console.BackgroundColor = ConsoleColor.Black;
                     }
+
                     
                     Console.Write($"()");
 
