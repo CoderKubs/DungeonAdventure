@@ -48,6 +48,8 @@ public class Program
     },
 
 
+
+
     };
 
 
@@ -88,6 +90,7 @@ public class Program
                                     }
                                 },
                                 
+                                
                             }
                     };
     public static void Main(){
@@ -123,7 +126,7 @@ public class Program
                                     new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', ' ', 'o', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
-                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'z', 'z', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x' }
@@ -311,7 +314,7 @@ public class Program
                             },
                             { "map", new char[][]
                                 {
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
@@ -326,10 +329,10 @@ public class Program
                             },
                             { "directions", new List<Tuple<string, int>>
                                 {
-                                    Tuple.Create("north", 2),
+                                    Tuple.Create("north", 6),
                                     Tuple.Create("south", 5),
                                     Tuple.Create("east", 3),
-                                    Tuple.Create("west", 1)
+                                    Tuple.Create("west", 6)
                                 }
                             },
 
@@ -396,7 +399,186 @@ public class Program
                             }
                             
                         }
-                    }
+                    },
+
+                    {  "level6", new Dictionary<string, object>
+                        {
+                            { "text", new List<string>
+                                {
+                                    "\nYou enter a room with a large /bpond ",
+                                    "Inside the pond, another large /bfish swims about.",
+                                }
+                            },
+                            { "objects", new List<GameObject>
+                                {
+                                
+                                    new GameObject
+                                    {
+                                        Name = "fish",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "eat", Health = 3, Response = "\n♪ Now we wish, to catch a fish, so jucy sweet! ♪\nThe fish wriggles in your mouth as you bite into it"},
+                                            new Action { Name = "take", Response = "The fish slips out of your pouch. Better just eat it.", Add = "none" },
+                                        }
+                                    },
+
+                                    new GameObject
+                                    {
+                                        Name = "pond",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "eat", Health = 1, Response = "\nBowing low, you begin to slurp. After just a few hours, the pond looks a little bit lower!"},
+                                            new Action { Name = "take", Response = "After scooping water into your pouch for a few minutes, you are now very wet", Add = "none" },
+                                        }
+                                    },
+
+                                }
+                            },
+                            { "map", new char[][]
+                                {
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
+                                    new char[] { ' ', ' ', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', ' ', ' '},
+                                    new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    }
+
+                            },
+                            { "directions", new List<Tuple<string, int>>
+                                {
+                                    Tuple.Create("north", 7),
+                                    Tuple.Create("south", 7),
+                                    Tuple.Create("east", 4),
+                                    Tuple.Create("west", 7)
+                                }
+                            },
+
+                            { "bots", new List<CharacterStats>()
+                                {
+                                }
+                            }
+                            
+                        }
+
+                    },
+
+                    {  "level7", new Dictionary<string, object>
+                        {
+                            { "text", new List<string>
+                                {
+                                    "\nYou enter a room with a large /bpond ... /rWait. You've been here before!",
+                                    "Inside the pond, a large /bfish swims about.",
+                                }
+                            },
+                            { "objects", new List<GameObject>
+                                {
+                                
+                                    new GameObject
+                                    {
+                                        Name = "fish",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "eat", Health = 3, Response = "\n♪ Now we wish, to catch a fish, so jucy sweet! ♪\nThe fish wriggles in your mouth as you bite into it"},
+                                            new Action { Name = "take", Response = "The fish slips out of your pouch. Better just eat it.", Add = "none" },
+                                        }
+                                    },
+
+                                    new GameObject
+                                    {
+                                        Name = "pond",
+                                        Actions = new List<Action>
+                                        {
+                                            new Action { Name = "eat", Health = 1, Response = "\nBowing low, you begin to slurp. After just a few hours, the pond looks a little bit lower!"},
+                                            new Action { Name = "take", Response = "After scooping water into your pouch for a few minutes, you are now very wet", Add = "none" },
+                                        }
+                                    },
+
+                                }
+                            },
+                            { "map", new char[][]
+                                {
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
+                                    new char[] { ' ', ' ', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', ' ', ' '},
+                                    new char[] { 'x', 'x', ' ', ' ', 'w', 'w', 'w', 'w', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    }
+
+                            },
+                            { "directions", new List<Tuple<string, int>>
+                                {
+                                    Tuple.Create("north", 6),
+                                    Tuple.Create("south", 8),
+                                    Tuple.Create("east", 6),
+                                    Tuple.Create("west", 6)
+                                }
+                            },
+
+                            { "bots", new List<CharacterStats>()
+                                {
+                                }
+                            }
+                            
+                        }
+
+                    },
+
+                    {  "level8", new Dictionary<string, object>
+                        {
+                            { "text", new List<string>
+                                {
+                                    "\nYou finally escape the large, non-euclidian space with the obviously magical pond.",
+                                    "Up ahead, you see an unlit /btorch on the /yback wall",
+                                    "This room looks a little bit too suspicious to be a dead end...",
+                                }
+                            },
+                            { "objects", new List<GameObject>
+                                {
+
+                                }
+                            },
+                            { "map", new char[][]
+                                {
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', '|', '|', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', '|', '|', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', '|', '|', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', '.', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'z', 'z', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'z', 'z', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'z', 'z', 'x', 'x', 'x', 'x', 'x'},
+                                    }
+
+                            },
+                            { "directions", new List<Tuple<string, int>>
+                                {
+                                    Tuple.Create("north", 7),
+                                    Tuple.Create("south", 5),
+                                    Tuple.Create("east", 3),
+                                    Tuple.Create("west", 1)
+                                }
+                            },
+
+                            { "bots", new List<CharacterStats>()
+                                {
+                                }
+                            }
+                            
+                        }
+
+                    },
                 };
 
 
@@ -678,6 +860,66 @@ public class Program
                             Console.ReadKey();
                     }
 
+                }
+
+                //If you use a torch...
+                if(inputAction == "use" && fromInventory == true && targetObject.Name == "torch"){
+                    int[] playerPosition = FindPlayer(level, playerChar);
+
+                    if (currentLevel == 8 && playerPosition[0] == 6) {
+
+                        char[][] levelMap = (char[][])level["map"];
+                        
+                        Console.Clear();
+                        DisplayMap(level, playerChar);
+                        Console.WriteLine("You place the flame on the unlit torch and it bursts aflame");
+                        Console.ReadKey(true);
+
+                        Console.WriteLine("Somewhere ahead, you hear a slithery, dry voice whispering something...");
+                        Console.ReadKey(true);
+
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("WHO IS IT?");
+                        Console.ReadKey(true);
+
+                        Console.WriteLine("WHO DARES ENTER MY DOMAIN?");
+                        Console.ReadKey(true);
+
+                        Console.Clear();
+                        //iterate through the map and add the wall
+                        for (int i = 0; i < levelMap.Length; i++) {
+                            for (int j = 0; j < levelMap[i].Length; j++) {
+                                if(levelMap[i][j] == '|'){
+                                    levelMap[i][j] = 'x';
+                                }
+                            }
+                        }
+                        DisplayMap(level, playerChar);
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("I.. was just leaving!");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("When you turn around, the passageway is gone.");
+                        Console.ReadKey(true);
+
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("ENTER, MY SNACK...");
+
+                        //iterate through the map and remove the wall
+                        for (int i = 0; i < levelMap.Length; i++) {
+                            for (int j = 0; j < levelMap[i].Length; j++) {
+                                if(levelMap[i][j] == 'z'){
+                                    levelMap[i][j] = ' ';
+                                }
+                            }
+                        }
+
+                        DisplayMap(level, playerChar);
+                        Console.ReadKey(true);
+
+                        Console.Clear();
+                        DisplayLevel(level, playerChar);
+                    }
                 }
             }
         }
@@ -1604,6 +1846,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
     }
 
     static void PickUpLoot(char lootType){
+        Console.Clear();
         if(lootType == '.' || lootType == ','){ // basic chest
             int randomNumber = rand.Next(1,4);
             if(randomNumber == 1){                //Weapon
@@ -1701,11 +1944,18 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
     static void DisplayLevel(Dictionary<string, object> level,char playerChar){
 
         Console.Clear();
-        char[][] map = (char[][])level["map"];
 
         // Print the text
         string text = GetLevelText(level);
         WriteLineWithColors(text);
+        
+
+        DisplayMap(level, playerChar);
+    }
+
+    static void DisplayMap(Dictionary<string, object> level,char playerChar){
+
+        char[][] map = (char[][])level["map"];
         
 
         // Print the level layout
@@ -1713,7 +1963,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         foreach (char[] row in map)
         {
             foreach (char tile in row){
-                if(tile == 'x'){
+                if(tile == 'x' || tile == 'z'){
 
                     Console.BackgroundColor = ConsoleColor.DarkGray;
                     Console.Write("  ");
@@ -1734,7 +1984,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
                 } else
                 if(tile == playerChar){
-                    if(lastTile == ' '){
+                    if(lastTile == ' ' || lastTile == '|'){
                         Console.BackgroundColor = ConsoleColor.Black;
                     } else if (lastTile == 'w'){
                         Console.BackgroundColor = ConsoleColor.Cyan;
@@ -1753,8 +2003,12 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                     Console.BackgroundColor = ConsoleColor.Cyan;
                     Console.Write($"  ");
 
+                } else
+                if(tile == '|'){
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.Write("  ");
                 }
-                 else{
+                else{
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write($"{tile} ");
                 }
