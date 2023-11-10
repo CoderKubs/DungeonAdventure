@@ -4,9 +4,14 @@
 
 //Level 1 dictionary holding the level info
 
+using System.Data;
+using System.Diagnostics.Tracing;
+using System.Xml;
+
 public class Program
 {   
     public static bool speed;
+    public static int dragonHP = 30;
     public static (string, string)[] basicChestLootWeapons = new (string, string)[] {
     ("Sword", "1d8"),
     ("Knife", "2d3"),
@@ -45,6 +50,20 @@ public class Program
 
 
     public static string enemyAttackInfo = "";
+    public static char[][] dragonFireLocations = {                                    
+        new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+        new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+    };
+    public static int turn = 1;
     public static int gold = 0;
     public static Random rand = new Random();
     public static List<CharacterStats> fightingBots = new List<CharacterStats>();
@@ -110,7 +129,6 @@ public class Program
                             },
                             { "map", new char[][]
                                 {
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x', 'x', 'x' },
                                     new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x' },
@@ -186,7 +204,6 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
@@ -556,6 +573,52 @@ public class Program
                             { "directions", new List<Tuple<string, int>>
                                 {
                                     Tuple.Create("north", 7),
+                                    Tuple.Create("south", 9),
+                                    Tuple.Create("east", 3),
+                                    Tuple.Create("west", 1)
+                                }
+                            },
+
+                            { "bots", new List<CharacterStats>()
+                                {
+                                }
+                            }
+                            
+                        }
+
+                    },
+
+                     {  "level9", new Dictionary<string, object>
+                        {
+                            { "text", new List<string>
+                                {
+                                    "\nA /rDRAGON!",
+                                    "Don't get eaten!",
+                                }
+                            },
+                            { "objects", new List<GameObject>
+                                {
+
+                                }
+                            },
+                            { "map", new char[][]
+                                {
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', '|', '|', 'x', 'x', 'x', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x', 'x'},
+                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'},
+                                    }
+
+                            },
+                            { "directions", new List<Tuple<string, int>>
+                                {
+                                    Tuple.Create("north", 8),
                                     Tuple.Create("south", 5),
                                     Tuple.Create("east", 3),
                                     Tuple.Create("west", 1)
@@ -651,8 +714,6 @@ public class Program
                             if(currentLevel == 5 && rand.Next(1,3) == 1){
 
                                 Console.Clear();
-                                // DisplayLevel(level, playerChar);
-                                // Thread.Sleep(500);
                                 MoveBots(level,playerChar);
                             }
                             fighting = CheckIfBotNearby(level, playerChar,fighting);
@@ -665,6 +726,22 @@ public class Program
                         if(lastTile == '.' || lastTile == ',' || lastTile == ':'){
                             PickUpLoot(lastTile);
                             lastTile = ' ';
+                        }
+
+
+                        if(moving == false){
+                            break;
+                        }
+
+                        //Boss Fight
+                        int[] playerPosition = FindPlayer(level, playerChar);
+
+                        if(currentLevel == 9 && playerPosition[0]>0){
+                            fighting = BossFightController(level, playerPosition);
+
+                            if(fighting){
+                                break;
+                            }
                         }
 
                     }while(moving);
@@ -707,6 +784,129 @@ public class Program
         } while (true);
     }
 
+
+    static bool BossFightController(Dictionary<string, object> level, int [] playerPosition){
+        UpdateDragonFires();
+
+        if(turn==1){
+            Console.Clear();
+            Console.WriteLine("Looks like there is no going back");
+
+            char[][] levelMap = (char[][])level["map"];
+
+            //iterate through the map and add the wall
+            for (int i = 0; i < levelMap.Length; i++) {
+                for (int j = 0; j < levelMap[i].Length; j++) {
+                    if(i == 0){
+                        levelMap[i][j] = 'x';
+                    }
+                }
+            }
+
+            Console.ReadKey(true);
+        }
+
+        if(turn==3){
+            Console.Clear();
+            WriteLineWithColors("AHH! ITS SHOOTING /rFIRE!");
+            Console.ReadKey(true);
+        }
+
+        if(turn==4){
+            CreateDragonFire(playerPosition);
+        }
+
+        if(turn==8){
+            Console.Clear();
+            WriteLineWithColors("/rYOU /rCAN'T /rRUN /rFROM /rME");
+            Console.ReadKey(true);
+        }
+
+        if(turn==9 || turn==11){
+            CreateDragonFire(playerPosition);
+        }
+
+        if(turn==14){
+            Console.Clear();
+            WriteLineWithColors("The dragon swoops down");
+            Console.ReadKey(true);
+
+            fightingBots.Add(new CharacterStats { Char = ' ', Direction = "left", StandingOn = ' ', IsChasing = false,  Health = dragonHP,  Armor = 5, Weapons = new List<(string,string)> {("Fire Breath"," ")}});
+
+            turn++;
+            return true;
+        }
+
+        if(turn==17){
+            CreateDragonFire(playerPosition);
+        }
+
+        if(turn==18){
+            CreateDragonFire(playerPosition);
+        }
+
+        if(turn==20){
+            CreateDragonFire(playerPosition);
+        }
+
+        if(turn==21){
+            CreateDragonFire(playerPosition);
+        }
+
+        if(turn==25){
+            Console.Clear();
+            WriteLineWithColors("The dragon swoops down");
+            Console.ReadKey(true);
+
+            fightingBots.Add(new CharacterStats { Char = ' ', Direction = "left", StandingOn = ' ', IsChasing = false,  Health = dragonHP,  Armor = 5, Weapons = new List<(string,string)> {("Fire Breath"," ")}});
+
+            turn = 15;
+            return true;
+        }
+
+
+
+        turn++;
+        return false;
+    }
+
+    static void UpdateDragonFires(){
+
+            for (int i = 0; i < dragonFireLocations.Length; i++){
+                for(int j = 0; j < dragonFireLocations.Length; j++){
+                    if(dragonFireLocations[i][j] == 'h'){
+                        dragonFireLocations[i][j] = 'j';
+                    }else if(dragonFireLocations[i][j] == 'j'){
+                        dragonFireLocations[i][j] = 'f';
+                    }else if(dragonFireLocations[i][j] == 'f'){
+                        dragonFireLocations[i][j] = ' ';
+                    }
+
+                }
+            }
+
+    }
+    static void CreateDragonFire(int[] playerPosition){
+        int playerX = playerPosition[0];
+        int playerY = playerPosition[1];
+
+        for (int i = 0; i < dragonFireLocations.Length; i++){
+            for(int j = 0; j < dragonFireLocations[i].Length; j++){
+                if(dragonFireLocations[i][j] == ' '){
+                    // Calculate distance from the player
+                    int distance = Math.Abs(playerX - i) + Math.Abs(playerY - j);
+
+                    // Adjust probability based on distance
+                    double probability = Math.Max(0, 1.0 - distance * 0.2); // Adjust the coefficient as needed
+
+                    if(rand.NextDouble() <= probability){
+                        dragonFireLocations[i][j] = 'h';
+                    }
+                }
+            }
+        }
+
+    }
     static void DisplayHelp(){
         Console.Clear();
         Console.WriteLine();
@@ -854,6 +1054,7 @@ public class Program
                                 }
                                 
                             }
+                            
                         }
 
                     }else if (inputAction == "take" && fromInventory == false && action.Name == "take")
@@ -945,6 +1146,16 @@ public class Program
 
         // do the players turn, check if he won, if not, do the bots turn
         bool fighting = PlayerTurn(level, levels ,playerChar);
+
+        if(currentLevel == 9){
+            foreach(CharacterStats dragon in fightingBots){
+                DisplayFightingLevel(level, playerChar);
+                Console.ReadKey();
+                dragonHP = dragon.Health;
+            }
+            fighting = false;
+        }
+
         if (!fighting){
             return fighting;
         }
@@ -1172,6 +1383,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                     input = GetWhatToDo();
                 } else{
                     input = "run";
+                    speed = false;
                 }
 
                 bool playerTurnOver = true;
@@ -1217,7 +1429,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                             enemyAttackInfo += $"You hit, dealing {damageToDeal} damage\n";
                             fighting = DamageBot(level, fightingBots[0].Char, damageToDeal);
                         } else{
-                            enemyAttackInfo += $"You miss, dealing {damageToDeal/2} damage\n";
+                            enemyAttackInfo += $"You deal a glancing blow, inflicting {damageToDeal/2} damage\n";
                             fighting = DamageBot(level, fightingBots[0].Char, damageToDeal/2);
                         }
 
@@ -1696,10 +1908,10 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
             {
                 return (newLevelNumber, true);
             }
-        
 
-        return (currentLevel, true);
-    }
+
+            return (currentLevel, true);
+        }
 
 static char MoveCharToPlace(Dictionary<string, object> level, char thingToMove, string directon, char whatToReplaceWith){
             char lastTile = ' ';
@@ -1970,6 +2182,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         
 
         DisplayMap(level, playerChar);
+        WriteLineWithColors($"Health: /g{playerStats.Health}\n\n");
     }
 
     static void DisplayMap(Dictionary<string, object> level,char playerChar){
@@ -1979,9 +2192,12 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
         // Print the level layout
         Console.WriteLine("\n");
-        foreach (char[] row in map)
+        for(int i = 0; i < map.Length; i++)
         {
-            foreach (char tile in row){
+            char[] row = map[i];
+            for(int j = 0; j < row.Length; j++){
+                char tile = map[i][j];
+
                 if(tile == 'x' || tile == 'z'){
 
                     Console.BackgroundColor = ConsoleColor.DarkGray;
@@ -2003,8 +2219,21 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
 
                 } else
                 if(tile == playerChar){
+                    Console.BackgroundColor = ConsoleColor.Black;
                     if(lastTile == ' ' || lastTile == '|'){
+
+                    //If fire will be here, make the player red.
+                    if(dragonFireLocations[i][j]=='h'){
                         Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    } else if(dragonFireLocations[i][j]=='f'){
+                        Console.BackgroundColor = ConsoleColor.Red;
+                        playerStats.Health -= 5;
+                        Console.ForegroundColor = ConsoleColor.White;
+                    } else {
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
                     } else if (lastTile == 'w'){
                         Console.BackgroundColor = ConsoleColor.Cyan;
                     } else if (lastTile == '.'||lastTile == ',' || lastTile == ':'){
@@ -2027,9 +2256,30 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write("  ");
                 }
-                else{
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    Console.Write($"{tile} ");
+                else{//If the space is a special character we havent named, or its a ' '
+
+                    
+                    //if fire will be there make it red
+                    if(dragonFireLocations[i][j]=='h'){
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.ForegroundColor = ConsoleColor.Red;
+
+                        if(tile != ' '){
+                            Console.Write($"{tile}");
+                        } else {
+                            Console.Write("!!");
+                        }
+
+                        //If fire is there, just put a red background
+                    } else if(dragonFireLocations[i][j]=='f'){
+                        Console.BackgroundColor = ConsoleColor.Red;
+                        Console.Write($"  ");
+
+                    } else{ //If there is no fire, just display the character
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($"{tile} ");
+                    }
+                    
                 }
             }
             Console.WriteLine();
