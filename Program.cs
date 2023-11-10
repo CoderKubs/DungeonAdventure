@@ -3,19 +3,10 @@
 
 
 //Level 1 dictionary holding the level info
-using System.Data;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
-using System.Dynamic;
-using System.Numerics;
-using System.Reflection.Emit;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.ExceptionServices;
-using System.Runtime.InteropServices;
-using System.Xml;
 
 public class Program
 {   
+    public static bool speed;
     public static (string, string)[] basicChestLootWeapons = new (string, string)[] {
     ("Sword", "1d8"),
     ("Knife", "2d3"),
@@ -735,6 +726,9 @@ public class Program
         WriteLineWithColors("/btake /b<item>");
         Console.WriteLine();
 
+        WriteLineWithColors("/buse /b<item>");
+        Console.WriteLine();
+
         Console.WriteLine("\n\npress any button to continue");
         Console.ReadKey(true);
     }
@@ -832,24 +826,37 @@ public class Program
                         playerStats.Health+= action.Health;
 
                         if(inputItem == "speed potion"){
+                            speed = true;
                             Console.Clear();
                             WriteLineWithColors("You get /y4 moves. Use them wisely.");
                             WriteLineWithColors("\nPress any key to continue");
                             Console.ReadKey(true);
 
-                            for(int i = 1; i <5; i++){
-                                DisplayLevel(level,playerChar);
-                                MoveCharacter(levels, playerChar);
+                            for(int i = 0; i < 3; i++){
+
+                                //Enters move character mode for four moves
+                                bool moving = true;
+                                int newLevel = currentLevel;
+
+                                //Move the player                                
+                                (newLevel, moving) = MoveCharacter(levels,playerChar);
+
+                                //Update the level
+                                if (newLevel != currentLevel){
+                                    currentLevel = newLevel;
+                                }
+
+                                level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
+
+                                if(lastTile == '.' || lastTile == ',' || lastTile == ':'){
+                                    PickUpLoot(lastTile);
+                                    lastTile = ' ';
+                                }
+                                
                             }
-                        } else{
-                            Console.ReadKey();
                         }
 
-                        
-                        break;
-                    }
-
-                    else if (inputAction == "take" && fromInventory == false && action.Name == "take")
+                    }else if (inputAction == "take" && fromInventory == false && action.Name == "take")
                     {
                             // Handle the "take" action
                             Console.WriteLine(action.Response);
@@ -863,7 +870,7 @@ public class Program
                 }
 
                 //If you use a torch...
-                if(inputAction == "use" && fromInventory == true && targetObject.Name == "torch"){
+                if(inputAction == "use" && fromInventory == true && (targetObject.Name == "torch" || targetObject.Name == "candle")){
                     int[] playerPosition = FindPlayer(level, playerChar);
 
                     if (currentLevel == 8 && playerPosition[0] == 6) {
@@ -872,7 +879,7 @@ public class Program
                         
                         Console.Clear();
                         DisplayMap(level, playerChar);
-                        Console.WriteLine("You place the flame on the unlit torch and it bursts aflame");
+                        Console.WriteLine("You place the flame on the unlit torch and it lights the walls with an eery glow");
                         Console.ReadKey(true);
 
                         Console.WriteLine("Somewhere ahead, you hear a slithery, dry voice whispering something...");
@@ -883,6 +890,7 @@ public class Program
                         Console.ReadKey(true);
 
                         Console.WriteLine("WHO DARES ENTER MY DOMAIN?");
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.ReadKey(true);
 
                         Console.Clear();
@@ -904,6 +912,8 @@ public class Program
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("ENTER, MY SNACK...");
+                        Console.ForegroundColor = ConsoleColor.White;
+
 
                         //iterate through the map and remove the wall
                         for (int i = 0; i < levelMap.Length; i++) {
@@ -919,6 +929,9 @@ public class Program
 
                         Console.Clear();
                         DisplayLevel(level, playerChar);
+                    } else if(currentLevel == 8){
+                        Console.WriteLine("The torch is on the back wall... not there");
+                        Console.ReadKey(true);
                     }
                 }
             }
@@ -1117,7 +1130,6 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
     {
         bool fighting = true;
         fighting = CheckIfBotNearby(level,playerChar, true);
-
         if(!fighting){
             List<CharacterStats> botsList = (List<CharacterStats>)level["bots"];
                 List<CharacterStats> updatedBotsList = new List<CharacterStats>(botsList.Count);
@@ -1154,7 +1166,14 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
 
                 Console.WriteLine("\nWhat do you do?");
                 Console.WriteLine("\"h\" for help");
-                string input = GetWhatToDo();
+                string input;
+
+                if(!speed){
+                    input = GetWhatToDo();
+                } else{
+                    input = "run";
+                }
+
                 bool playerTurnOver = true;
 
                 if (input.ToLower() == "attack" || input.ToLower() == "2")
@@ -1281,7 +1300,7 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
                     playerTurnOver = false;
                 }else if(input.ToLower() == "eat" || input.ToLower() == "3"){
 
-                    Console.WriteLine("To eat, type \"eat\" space and the item you want to eat");
+                    Console.WriteLine("To eat, type \"eat\" space, and the item you want to eat");
                     Console.WriteLine("For example: eat apple");
                     Console.ReadKey();
                 } else {
@@ -1776,7 +1795,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (y + 1 < levelLayout.Length)
                 {
-                    if (levelLayout[y+1][x] == 'o' || levelLayout[y+1][x] == '1' || levelLayout[y+1][x] == '2' || levelLayout[y+1][x] == '3' || levelLayout[y+1][x] == '4' || levelLayout[y+1][x] == 'x'){
+                    if (levelLayout[y+1][x] == 'o' || levelLayout[y+1][x] == '1' || levelLayout[y+1][x] == '2' || levelLayout[y+1][x] == '3' || levelLayout[y+1][x] == '4' || levelLayout[y+1][x] == 'x' || levelLayout[y+1][x] == 'z'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -1790,7 +1809,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (y - 1 >= 0)
                 {
-                    if (levelLayout[y-1][x] == 'o' || levelLayout[y-1][x] == '1' || levelLayout[y-1][x] == '2' || levelLayout[y-1][x] == '3' || levelLayout[y-1][x] == '4' || levelLayout[y-1][x] == 'x'){
+                    if (levelLayout[y-1][x] == 'o' || levelLayout[y-1][x] == '1' || levelLayout[y-1][x] == '2' || levelLayout[y-1][x] == '3' || levelLayout[y-1][x] == '4' || levelLayout[y-1][x] == 'x' || levelLayout[y-1][x] == 'z'){
                         return Tuple.Create(false, currentLevel);;
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -1803,7 +1822,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (x - 1 >= 0)
                 {
-                    if (levelLayout[y][x-1] == 'o' || levelLayout[y][x-1] == '1' || levelLayout[y][x-1] == '2' || levelLayout[y][x-1] == '3' || levelLayout[y][x-1] == '4' || levelLayout[y][x-1] == 'x'){
+                    if (levelLayout[y][x-1] == 'o' || levelLayout[y][x-1] == '1' || levelLayout[y][x-1] == '2' || levelLayout[y][x-1] == '3' || levelLayout[y][x-1] == '4' || levelLayout[y][x-1] == 'x' || levelLayout[y][x-1] == 'z'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
@@ -1816,7 +1835,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
             {
                 if (x + 1 < levelLayout[y].Length)
                 {
-                    if (levelLayout[y][x+1] == 'o' || levelLayout[y][x+1] == '1' || levelLayout[y][x+1] == '2' || levelLayout[y][x+1] == '3' || levelLayout[y][x+1] == '4' || levelLayout[y][x+1] == 'x'){
+                    if (levelLayout[y][x+1] == 'o' || levelLayout[y][x+1] == '1' || levelLayout[y][x+1] == '2' || levelLayout[y][x+1] == '3' || levelLayout[y][x+1] == '4' || levelLayout[y][x+1] == 'x' || levelLayout[y][x+1] == 'z'){
                         return Tuple.Create(false, currentLevel);
                     } else {return Tuple.Create(true, currentLevel);}
                 }
