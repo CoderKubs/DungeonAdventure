@@ -11,6 +11,7 @@ using System.Xml;
 public class Program
 {   
     public static bool speed;
+    public static float difficultyOfBoss = -0.7f;
     public static int dragonHP = 30;
     public static (string, string)[] basicChestLootWeapons = new (string, string)[] {
     ("Sword", "1d8"),
@@ -124,7 +125,7 @@ public class Program
                             { "text", new List<string>
                                 {
                                     "You awaken in a dimly lit chamber, with a lone /bcandle flickering on the /bfloor, casting feeble shadows on the walls.",
-                                    "You don't know how you got here, but you have a vague sence of someone watching you",
+                                    "You don't know how you got here, but you have a vague sense of someone watching you",
                                 }
                             },
                             { "map", new char[][]
@@ -149,7 +150,7 @@ public class Program
                                         Name = "candle",
                                         Actions = new List<Action>
                                         {
-                                            new Action { Name = "eat", Health = -1, Response = "The candle tastes like ash and... your mouth is burned"},
+                                            new Action { Name = "eat", Health = -1, Response = "The candle tastes like ash and... your mouth is burned. \n Don't worry, you can find some fire elsewhere"},
                                             new Action { Name = "take", Response = "You stash the candle in your fire-proof pocket", Add = "candle" },
                                         }
                                     },
@@ -808,25 +809,35 @@ public class Program
 
         if(turn==3){
             Console.Clear();
-            WriteLineWithColors("AHH! ITS SHOOTING /rFIRE!");
+            WriteLineWithColors("The /ddragon opens its mouth...");
+            Console.ReadKey(true);
+            WriteLineWithColors("And /rfire comes spewing out!");
             Console.ReadKey(true);
         }
 
         if(turn==4){
-            CreateDragonFire(playerPosition);
+            CreateDragonFire(playerPosition, 0.5f);
         }
 
         if(turn==8){
+            CreateDragonFire(playerPosition, 0.5f);
+        }
+
+        if(turn==12){
+            CreateDragonFire(playerPosition, 0.6f);
+        }
+
+        if(turn==16){
             Console.Clear();
             WriteLineWithColors("/rYOU /rCAN'T /rRUN /rFROM /rME");
             Console.ReadKey(true);
         }
 
-        if(turn==9 || turn==11){
-            CreateDragonFire(playerPosition);
+        if(turn==17 || turn==19){
+            CreateDragonFire(playerPosition, 1f);
         }
 
-        if(turn==14){
+        if(turn==22){
             Console.Clear();
             WriteLineWithColors("The dragon swoops down");
             Console.ReadKey(true);
@@ -837,30 +848,34 @@ public class Program
             return true;
         }
 
-        if(turn==17){
-            CreateDragonFire(playerPosition);
-        }
-
-        if(turn==18){
-            CreateDragonFire(playerPosition);
-        }
-
-        if(turn==20){
-            CreateDragonFire(playerPosition);
-        }
-
-        if(turn==21){
-            CreateDragonFire(playerPosition);
-        }
-
         if(turn==25){
+            CreateDragonFire(playerPosition, 1f + difficultyOfBoss);
+        }
+
+        if(turn==26){
+            CreateDragonFire(playerPosition, 1f + difficultyOfBoss);
+        }
+
+        if(turn==28){
+            CreateDragonFire(playerPosition, 1f + difficultyOfBoss);
+        }
+
+        if(turn==29){
+            CreateDragonFire(playerPosition, 1f + difficultyOfBoss);
+        }
+
+        if(turn==33){
             Console.Clear();
             WriteLineWithColors("The dragon swoops down");
             Console.ReadKey(true);
 
             fightingBots.Add(new CharacterStats { Char = ' ', Direction = "left", StandingOn = ' ', IsChasing = false,  Health = dragonHP,  Armor = 5, Weapons = new List<(string,string)> {("Fire Breath"," ")}});
 
-            turn = 15;
+            turn = 23;
+            difficultyOfBoss += 0.2f;
+            if(difficultyOfBoss > 2.5f){
+                difficultyOfBoss = 2.5f;
+            }
             return true;
         }
 
@@ -886,7 +901,7 @@ public class Program
             }
 
     }
-    static void CreateDragonFire(int[] playerPosition){
+    static void CreateDragonFire(int[] playerPosition, float probabilityMultiplyer){
         int playerX = playerPosition[0];
         int playerY = playerPosition[1];
 
@@ -899,7 +914,7 @@ public class Program
                     // Adjust probability based on distance
                     double probability = Math.Max(0, 1.0 - distance * 0.2); // Adjust the coefficient as needed
 
-                    if(rand.NextDouble() <= probability){
+                    if(rand.NextDouble() / probabilityMultiplyer <= probability){
                         dragonFireLocations[i][j] = 'h';
                     }
                 }
@@ -1055,6 +1070,8 @@ public class Program
                                 
                             }
                             
+                        } else {
+                            Console.ReadKey(true);
                         }
 
                     }else if (inputAction == "take" && fromInventory == false && action.Name == "take")
