@@ -1,15 +1,12 @@
 ﻿
 
 
+using System.Diagnostics;
 
-//Level 1 dictionary holding the level info
-
-using System.Data;
-using System.Diagnostics.Tracing;
-using System.Xml;
 
 public class Program
 {   
+    public static Stopwatch timeTaken = new Stopwatch();
     public static bool speed;
     public static float difficultyOfBoss = -0.7f;
     public static int dragonHP = 30;
@@ -116,7 +113,7 @@ public class Program
         numbers = enemy location (Make sure to add the enemy to the list)
         w = water
 
-        */
+        *///Level 1 dictionary holding the level info
         
         Dictionary<string, object> levels = new Dictionary<string, object>
                 {
@@ -205,10 +202,10 @@ public class Program
                                     new char[] { 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
                                     new char[] { 'x', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     }
 
                             },
@@ -255,9 +252,9 @@ public class Program
                             },
                             { "map", new char[][]
                                 {
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
-                                    new char[] { 'x', 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
-                                    new char[] { 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
+                                    new char[] { 'x', ' ', ' ', 'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', ' ', ' ', ' ', ' ', ' ', 'x', ' ', 'x'},
                                     new char[] { 'x', 'x', 'x', 'x', ' ', 'x', ' ', 'x', ' ', 'x', ' ', 'x'},
                                     new char[] { ' ', ' ', ' ', ' ', ' ', 'x', ':', 'x', ' ', ' ', ' ', 'x'},
@@ -403,7 +400,7 @@ public class Program
 
                             { "bots", new List<CharacterStats>()
                                 {
-                                    new CharacterStats { Char = '1', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 20,  Armor = 10, Weapons = new List<(string,string)> {("Club","2d8"),("Punch","1d10")}},
+                                    new CharacterStats { Char = '1', Direction = "right", StandingOn = ' ', IsChasing = false,  Health = 20,  Armor = 10, Weapons = new List<(string,string)> {("Club","2d8"),("Punch","2d5")}},
                                 }
                             }
                             
@@ -653,10 +650,24 @@ public class Program
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.White;
 
+        
+        timeTaken.Start();
+
         //
         //Main game
         //
+
+        WriteLineWithColors("Welcome to /rThe /rDungeon. This is a /pturn /pbased /pgame where your goal is to destroy the /revil /rbeing that lies within and escape.");
+        Console.WriteLine();
+        WriteLineWithColors("Because this is a /pturn /pbased /pgame, no matter how fast you tap the keys, the same things will happen. /gTAKE /gYOUR /gTIME.");
+        Console.WriteLine();
+        WriteLineWithColors("In addition to this, explore your /ysurroundings. Discover what lies in wait when you type in the correct things...");
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("Press any key to begin your adventure.");
+        Console.ReadKey();
         do{
+
             // set new variables for the level just in case we swiched
             level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
 
@@ -740,12 +751,16 @@ public class Program
                         if(currentLevel == 9 && playerPosition[0]>0){
                             fighting = BossFightController(level, playerPosition);
 
-                            if(fighting){
+                            if(fighting || dragonHP <= 0){
                                 break;
                             }
                         }
 
                     }while(moving);
+
+                    if(dragonHP <= 0){
+                        break;
+                    }
                 
                 } else if(output.ToLower() == "h" || output.ToLower() == "help"){
                     
@@ -783,6 +798,57 @@ public class Program
 
 
         } while (true);
+
+        //End Game.
+
+
+        Console.Clear();
+        Console.WriteLine("The dragon falls over.");
+        Console.ReadKey(true);
+        Console.WriteLine("You have won!");
+        Console.ReadKey(true);
+        Console.WriteLine("You sit down, and take a breath");
+        Console.ReadKey(true);
+        Console.WriteLine("And slowly");
+        Console.ReadKey(true);
+        Console.WriteLine("close");
+        Console.ReadKey(true);
+        Console.WriteLine("your");
+        Console.ReadKey(true);
+        Console.WriteLine("eyes...");
+
+        Console.WriteLine();
+        WriteLineWithColors("/yFINAL /ySTATS:");
+        Console.WriteLine();
+        Console.WriteLine("Gold: " + gold);
+        Console.WriteLine("Health: " + playerStats.Health);
+        timeTaken.Stop();
+        Console.WriteLine("Time: " + timeTaken.ElapsedMilliseconds/1000 + " seconds");
+
+        Console.WriteLine();
+        Console.WriteLine("YOU WIN!");
+
+    }
+
+    static void PlayerDeath(string cause){
+        Console.ReadKey();
+        Console.Clear();
+        WriteLineWithColors("/rYou /rdied.");
+        Console.ReadKey(true);
+
+        Console.WriteLine();
+        WriteLineWithColors($"Cause: /r{cause}");
+        Console.ReadKey(true);
+
+        Console.WriteLine();
+        WriteLineWithColors("/yFINAL /ySTATS:");
+        Console.WriteLine();
+        Console.WriteLine("Gold: " + gold);
+        Console.WriteLine("Health: " + playerStats.Health);
+        timeTaken.Stop();
+        Console.WriteLine("Time: " + timeTaken.ElapsedMilliseconds/1000 + " seconds");
+
+        Environment.Exit(0);
     }
 
 
@@ -865,19 +931,52 @@ public class Program
         }
 
         if(turn==33){
+            
             Console.Clear();
-            WriteLineWithColors("The dragon swoops down");
+            WriteLineWithColors("The dragon swoops down! ");
             Console.ReadKey(true);
 
             fightingBots.Add(new CharacterStats { Char = ' ', Direction = "left", StandingOn = ' ', IsChasing = false,  Health = dragonHP,  Armor = 5, Weapons = new List<(string,string)> {("Fire Breath"," ")}});
 
-            turn = 23;
+            if(dragonHP > 15){
+
+                turn = 23;
+            } else {
+                turn = 40;
+                WriteLineWithColors("/rIt /rhas /rbeen /renraged.");
+                Console.ReadKey();
+            }
+            
             difficultyOfBoss += 0.2f;
             if(difficultyOfBoss > 2.5f){
                 difficultyOfBoss = 2.5f;
             }
             return true;
         }
+
+        if(turn>= 40 && turn <= 50){
+            CreateDragonFire(playerPosition, 1f + difficultyOfBoss);
+        }
+
+
+        if(turn==54){
+            
+            Console.Clear();
+            WriteLineWithColors("The dragon swoops down and lands. Its /rwicked /claws gleam with dried /rblood.");
+            Console.ReadKey(true);
+
+            fightingBots.Add(new CharacterStats { Char = ' ', Direction = "left", StandingOn = ' ', IsChasing = false,  Health = dragonHP,  Armor = 5, Weapons = new List<(string,string)> {("Claws","2d4")}});
+
+            turn = 40;
+
+            
+            difficultyOfBoss += 0.2f;
+            if(difficultyOfBoss > 2.5f){
+                difficultyOfBoss = 2.5f;
+            }
+            return true;
+        }
+        
 
 
 
@@ -1039,6 +1138,11 @@ public class Program
                         targetObject.Name = rand.Next(1000,99999999).ToString();
 
                         playerStats.Health+= action.Health;
+                        
+                        //Kill the player if health is less then 0
+                        if(playerStats.Health <= 0){
+                            PlayerDeath("Curious taste buds");
+                        }
 
                         if(inputItem == "speed potion"){
                             speed = true;
@@ -1047,7 +1151,7 @@ public class Program
                             WriteLineWithColors("\nPress any key to continue");
                             Console.ReadKey(true);
 
-                            for(int i = 0; i < 3; i++){
+                            for(int i = 0; i < 4; i++){
 
                                 //Enters move character mode for four moves
                                 bool moving = true;
@@ -1264,6 +1368,11 @@ public class Program
             enemyAttackInfo += $"enemy {bot.Char} strikes with his {randomWeapon.Item1.ToLower()}. Your armor absorbes some of the impact and he deals {damage/2} damage\n";
             playerStats.Health -= damage/2; //Half Damage
         }
+
+        //Kill the player if health is less then 0
+        if(playerStats.Health <= 0){
+            PlayerDeath("killed in combat");
+        }
         
         
 
@@ -1284,10 +1393,15 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
     List<CharacterStats> fightingBotsUpdatedHealth = new List<CharacterStats>();
     foreach (CharacterStats fightingBot in fightingBots)
         {
+            
             CharacterStats botWithUpdatedHealth = fightingBot;
             if (fightingBot.Char == enemy.Char)
             {
                 botWithUpdatedHealth.Health -= damage;
+                if(currentLevel == 9){
+                    dragonHP = botWithUpdatedHealth.Health;
+                }
+
                 if (botWithUpdatedHealth.Health <= 0){
 
                     //If the bot is dead, remove it
@@ -1510,7 +1624,24 @@ static bool DamageBot(Dictionary<string, object> level, char botChar, int damage
 
                     level["bots"] = updatedBotsList; // Update the list in the dictionary
                     fighting = false;
-                    MoveCharacter(levels, playerChar);
+                    
+                    bool moving = true;
+                                int newLevel = currentLevel;
+
+                    //Move the player                                
+                    (newLevel, moving) = MoveCharacter(levels,playerChar);
+
+                    //Update the level
+                    if (newLevel != currentLevel){
+                        currentLevel = newLevel;
+                    }
+
+                    level = (Dictionary<string, object>)levels[$"level{currentLevel}"];
+
+                    if(lastTile == '.' || lastTile == ',' || lastTile == ':'){
+                        PickUpLoot(lastTile);
+                        lastTile = ' ';
+                    }
                     
                 } else if(input.ToLower() == "h" || input.ToLower() == "help"){
 
@@ -2246,6 +2377,7 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                     } else if(dragonFireLocations[i][j]=='f'){
                         Console.BackgroundColor = ConsoleColor.Red;
                         playerStats.Health -= 5;
+
                         Console.ForegroundColor = ConsoleColor.White;
                     } else {
                         Console.ForegroundColor = ConsoleColor.White;
@@ -2292,7 +2424,32 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
                         Console.BackgroundColor = ConsoleColor.Red;
                         Console.Write($"  ");
 
-                    } else{ //If there is no fire, just display the character
+                    } else  if(tile == '1' || tile == '2' || tile == '3' || tile == '4' ){
+
+                        List<CharacterStats> bots = (List<CharacterStats>)level["bots"];
+
+                        foreach (var bot in bots)
+                        {
+                            if (bot.Char == tile)
+                            {
+                                if (bot.IsChasing)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                }
+                                else
+                                {
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                }
+
+                                break;
+                            }
+                        }
+
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        Console.Write($"[]");
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                    } else{
                         Console.BackgroundColor = ConsoleColor.Black;
                         Console.Write($"{tile} ");
                     }
@@ -2303,6 +2460,11 @@ static void SetNewLevelPlayerPosition(Dictionary<string, object> levels, int new
         }
         Console.ForegroundColor = ConsoleColor.White;
         Console.BackgroundColor = ConsoleColor.Black;
+
+        //Kill the player if health is less then 0
+        if(playerStats.Health <= 0){
+            PlayerDeath("Burnt to a crisp");
+        }
     }
 }
 
